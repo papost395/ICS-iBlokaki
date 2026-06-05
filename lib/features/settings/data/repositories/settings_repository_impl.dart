@@ -1,0 +1,83 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:pocketbase/pocketbase.dart';
+import 'package:order/core/constants/api_constants.dart';
+import 'package:order/features/settings/data/datasources/local_settings_datasource.dart';
+import 'package:order/features/settings/data/datasources/remote_settings_datasource.dart';
+import 'package:order/features/settings/data/models/shop_config_model.dart';
+import 'package:order/features/settings/domain/entities/shop_config.dart';
+import 'package:order/features/settings/domain/repositories/settings_repository.dart';
+
+class SettingsRepositoryImpl implements SettingsRepository {
+  SettingsRepositoryImpl({
+    required this.localDataSource,
+    required this.remoteDataSource,
+    required this.pb,
+  });
+
+  final LocalSettingsDataSource localDataSource;
+  final RemoteSettingsDataSource remoteDataSource;
+  final PocketBase pb;
+
+  @override
+  Future<ShopConfig> getShopConfig(String shopId) {
+    return remoteDataSource.getShopConfig(shopId);
+  }
+
+  @override
+  Stream<ShopConfig> watchShopConfig(String shopId) {
+    final controller = StreamController<ShopConfig>.broadcast();
+
+    remoteDataSource.getShopConfig(shopId).then(controller.add);
+
+    pb.collection(ApiConstants.shopConfigsCollection).subscribe(
+      '*',
+      (e) async {
+        if (e.record != null) {
+          controller.add(ShopConfigModel.fromRecord(e.record!));
+        }
+      },
+    );
+
+    controller.onCancel = () {
+      pb.collection(ApiConstants.shopConfigsCollection).unsubscribe('*');
+    };
+
+    return controller.stream;
+  }
+
+  @override
+  Future<void> updateShopConfig(ShopConfig config) {
+    return remoteDataSource.updateShopConfig(config);
+  }
+
+  @override
+  Future<ThemeMode> getThemeMode() async {
+    return localDataSource.getThemeMode();
+  }
+
+  @override
+  Future<void> setThemeMode(ThemeMode mode) {
+    return localDataSource.setThemeMode(mode);
+  }
+
+  @override
+  Future<Locale> getLocale() async {
+    return localDataSource.getLocale();
+  }
+
+  @override
+  Future<void> setLocale(Locale locale) {
+    return localDataSource.setLocale(locale);
+  }
+
+  @override
+  Future<Map<String, String>> getCloudKeys() {
+    return localDataSource.getCloudKeys();
+  }
+
+  @override
+  Future<void> setCloudKeys(String appId, String appKey) {
+    return localDataSource.setCloudKeys(appId, appKey);
+  }
+}

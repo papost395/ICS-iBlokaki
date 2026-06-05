@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Οδηγός Χρήσης – MatCashMachine SDK</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: none; }
+      .page { margin: 0; box-shadow: none; width: 210mm; min-height: 297mm; overflow: hidden; }
+      @page { size: A4; margin: 0; }
+    }
+
+    :root {
+      --primary: #0052CC;
+      --primary-dark: #003d99;
+      --primary-light: #4d90fe;
+      --primary-xlight: #e8f0fe;
+      --accent: #FF8C00;
+      --accent-light: #fff3e0;
+      --green: #00875a;
+      --green-light: #e3fcef;
+      --red: #de350b;
+      --red-light: #ffebe6;
+      --purple: #5243aa;
+      --purple-light: #EAE6FF;
+      --text: #172b4d;
+      --text-muted: #6b778c;
+      --border: #dfe1e6;
+      --white: #ffffff;
+      --bg: #f4f5f7;
+      --code-bg: #1e1e2e;
+      --code-green: #a6e3a1;
+      --code-blue: #89b4fa;
+      --code-yellow: #f9e2af;
+      --code-pink: #f38ba8;
+      --code-gray: #6c7086;
+      --code-teal: #94e2d5;
+      --code-lavender: #cba6f7;
+      --code-white: #cdd6f4;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #dce3ee;
+      color: var(--text);
+      font-size: 10pt;
+      line-height: 1.6;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20px auto;
+      background: white;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+
+    /* ══════════════ COVER ══════════════ */
+    .cover {
+      background: linear-gradient(145deg, #001b6e 0%, #003d99 50%, #0052CC 100%);
+      height: 297mm;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover-stripe { position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: var(--accent); }
+    .cover-circle-1 { position: absolute; top: -60px; right: -60px; width: 350px; height: 350px; background: rgba(255,255,255,0.04); border-radius: 50%; }
+    .cover-circle-2 { position: absolute; bottom: -80px; left: -40px; width: 400px; height: 400px; background: rgba(255,255,255,0.03); border-radius: 50%; }
+    .cover-circle-3 { position: absolute; top: 200px; right: 60px; width: 180px; height: 180px; background: rgba(255,140,0,0.12); border-radius: 50%; }
+
+    .cover-header { padding: 46px 60px 0 65px; display: flex; align-items: center; gap: 14px; position: relative; z-index: 2; }
+    .cover-icon { width: 50px; height: 50px; background: var(--accent); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .cover-brand { color: white; font-size: 17pt; font-weight: 800; letter-spacing: 0.3px; }
+    .cover-brand span { color: var(--accent); }
+
+    .cover-body { flex: 1; padding: 56px 60px 0 65px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 2; }
+    .cover-tag { display: inline-block; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); color: rgba(255,255,255,0.8); font-size: 7.5pt; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 26px; width: fit-content; }
+    .cover-title { font-size: 32pt; font-weight: 900; color: white; line-height: 1.12; margin-bottom: 14px; letter-spacing: -0.5px; }
+    .cover-title .hl { color: var(--accent); }
+    .cover-subtitle { font-size: 11.5pt; color: rgba(255,255,255,0.6); font-weight: 400; margin-bottom: 44px; max-width: 420px; line-height: 1.7; }
+    .cover-divider { width: 56px; height: 3px; background: var(--accent); border-radius: 2px; margin-bottom: 34px; }
+    .cover-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cover-pill { background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.78); padding: 6px 15px; border-radius: 20px; font-size: 8pt; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .pill-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
+
+    .cover-stats { display: flex; gap: 28px; margin-top: 44px; padding-top: 36px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .stat { }
+    .stat-num { font-size: 22pt; font-weight: 900; color: white; line-height: 1; }
+    .stat-num span { color: var(--accent); }
+    .stat-label { font-size: 8pt; color: rgba(255,255,255,0.5); margin-top: 4px; }
+
+    .cover-footer { padding: 28px 60px 32px 65px; display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 2; border-top: 1px solid rgba(255,255,255,0.08); }
+    .cover-footer-left { color: rgba(255,255,255,0.45); font-size: 8pt; line-height: 1.9; }
+    .cover-footer-right { text-align: right; }
+    .version-badge { display: inline-block; background: var(--accent); color: white; padding: 3px 12px; border-radius: 10px; font-size: 8pt; font-weight: 700; margin-bottom: 4px; }
+    .cover-footer-right p { color: rgba(255,255,255,0.45); font-size: 8pt; }
+
+    /* ══════════════ CONTENT PAGES ══════════════ */
+    .page-header { background: var(--primary); padding: 18px 48px; display: flex; align-items: center; justify-content: space-between; }
+    .ph-left { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.65); font-size: 8pt; font-weight: 500; }
+    .ph-sep { opacity: 0.4; }
+    .ph-current { color: white; font-weight: 700; }
+    .ph-logo { color: rgba(255,255,255,0.8); font-size: 9pt; font-weight: 700; }
+
+    .page-content { padding: 30px 48px 80px; }
+
+    .sec-title { font-size: 17pt; font-weight: 800; color: var(--primary-dark); margin-bottom: 5px; letter-spacing: -0.3px; }
+    .sec-sub { font-size: 9.5pt; color: var(--text-muted); margin-bottom: 22px; }
+
+    /* TOC */
+    .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .toc-item { background: var(--primary-xlight); border: 1px solid #c2d4fa; border-radius: 10px; padding: 14px 18px; display: flex; align-items: flex-start; gap: 13px; }
+    .toc-num { width: 30px; height: 30px; background: var(--primary); color: white; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 11pt; font-weight: 900; flex-shrink: 0; }
+    .toc-info h4 { font-size: 9.5pt; font-weight: 700; color: var(--primary-dark); margin-bottom: 2px; }
+    .toc-info p { font-size: 8pt; color: var(--text-muted); line-height: 1.4; }
+
+    /* Info box */
+    .info-box { border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; display: flex; gap: 11px; align-items: flex-start; }
+    .info-box.blue { background: var(--primary-xlight); border: 1.5px solid #93bfff; }
+    .info-box.green { background: var(--green-light); border: 1.5px solid #79f2c0; }
+    .info-box.orange { background: var(--accent-light); border: 1.5px solid #ffb74d; }
+    .info-box.red { background: var(--red-light); border: 1.5px solid #ff8f73; }
+    .info-box.purple { background: var(--purple-light); border: 1.5px solid #b3a3e8; }
+    .ib-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .ib-text { font-size: 9pt; line-height: 1.65; }
+    .ib-text strong { font-weight: 700; display: block; margin-bottom: 2px; font-size: 9.5pt; }
+
+    /* Step cards */
+    .step-card { background: white; border: 1.5px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+    .step-header { background: var(--primary); padding: 13px 20px; display: flex; align-items: center; gap: 13px; }
+    .step-badge { width: 34px; height: 34px; background: white; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12pt; font-weight: 900; flex-shrink: 0; }
+    .step-title { color: white; font-size: 11.5pt; font-weight: 700; }
+    .step-desc { color: rgba(255,255,255,0.72); font-size: 8pt; margin-top: 1px; }
+    .step-body { padding: 18px 20px; }
+
+    /* Sub steps */
+    .sub-steps { list-style: none; }
+    .sub-steps li { display: flex; gap: 11px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid #f1f2f5; }
+    .sub-steps li:last-child { border-bottom: none; }
+    .sub-dot { width: 21px; height: 21px; background: var(--primary-xlight); border: 2px solid var(--primary-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7pt; font-weight: 800; color: var(--primary); flex-shrink: 0; margin-top: 2px; }
+    .sub-text { font-size: 9pt; line-height: 1.65; color: var(--text); }
+    .sub-text strong { color: var(--primary-dark); font-weight: 700; }
+
+    /* Code inline */
+    .ci { display: inline-block; background: #f0f3fa; border: 1px solid #c7d3eb; border-radius: 4px; padding: 1px 6px; font-family: 'JetBrains Mono', monospace; font-size: 8pt; color: var(--primary-dark); }
+    .ci.green { background: var(--green-light); border-color: #57d9a3; color: var(--green); }
+    .ci.orange { background: var(--accent-light); border-color: #ffb74d; color: #b35c00; }
+    .ci.red { background: var(--red-light); border-color: #ff8f73; color: var(--red); }
+
+    /* Two column */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 12px 0; }
+
+    /* Role cards */
+    .role-card { background: var(--primary-xlight); border: 1.5px solid #c2d4fa; border-radius: 10px; padding: 14px 16px; }
+    .role-card h4 { font-size: 9.5pt; font-weight: 700; color: var(--primary-dark); margin-bottom: 9px; padding-bottom: 7px; border-bottom: 2px solid var(--primary); display: flex; align-items: center; gap: 7px; }
+    .role-card ul { list-style: none; }
+    .role-card ul li { font-size: 8.5pt; color: var(--text); padding: 3px 0; display: flex; align-items: flex-start; gap: 7px; }
+    .role-card ul li::before { content: '›'; color: var(--primary); font-weight: 900; font-size: 11pt; line-height: 1.2; flex-shrink: 0; }
+
+    /* Command table */
+    .cmd-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 16px; }
+    .cmd-table thead tr { background: var(--primary); color: white; }
+    .cmd-table thead th { padding: 10px 14px; font-weight: 700; font-size: 8.5pt; text-align: left; }
+    .cmd-table tbody tr:nth-child(odd) { background: white; }
+    .cmd-table tbody tr:nth-child(even) { background: var(--bg); }
+    .cmd-table tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    .cmd-table tbody tr:last-child td { border-bottom: none; }
+    .cmd-table .method { font-family: 'JetBrains Mono', monospace; font-size: 8pt; color: var(--primary-dark); font-weight: 600; }
+    .cmd-table .code-letter { background: var(--primary); color: white; border-radius: 4px; padding: 1px 6px; font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; font-weight: 700; }
+    .cmd-table .returns { font-size: 7.5pt; color: var(--text-muted); }
+    .cmd-table .desc { font-size: 8.5pt; color: var(--text); }
+    .cmd-table .throws { color: var(--red); font-size: 7.5pt; }
+
+    /* Dark code blocks */
+    .code-block {
+      background: var(--code-bg);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 14px 0;
+      overflow: hidden;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8pt;
+      line-height: 1.85;
+      position: relative;
+    }
+    .code-block .cb-label {
+      position: absolute; top: 9px; right: 14px;
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.4);
+      font-size: 7pt; font-weight: 600;
+      padding: 2px 8px; border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .code-block .kw { color: var(--code-lavender); }   /* keywords: await, final, try, on, catch, if */
+    .code-block .fn { color: var(--code-blue); }        /* function/method names */
+    .code-block .str { color: var(--code-green); }      /* strings */
+    .code-block .num { color: var(--code-yellow); }     /* numbers */
+    .code-block .cls { color: var(--code-teal); }       /* class names */
+    .code-block .cmt { color: var(--code-gray); font-style: italic; } /* comments */
+    .code-block .var { color: var(--code-white); }      /* variables */
+    .code-block .punc { color: rgba(205,214,244,0.6); } /* punctuation */
+    .code-block .type { color: var(--code-pink); }      /* types */
+    .code-block .line { display: block; }
+
+    /* Exception chips */
+    .ex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0; }
+    .ex-chip { border-radius: 8px; padding: 11px 14px; border: 1.5px solid; }
+    .ex-chip.conn { background: #fff3e0; border-color: #ffb74d; }
+    .ex-chip.comm { background: #f3e5f5; border-color: #ce93d8; }
+    .ex-chip.ecr  { background: var(--red-light); border-color: #ff8f73; }
+    .ex-chip.pkt  { background: #e8f5e9; border-color: #81c784; }
+    .ex-chip.tmo  { background: var(--primary-xlight); border-color: #93bfff; }
+    .ex-chip-name { font-family: 'JetBrains Mono', monospace; font-size: 8pt; font-weight: 700; margin-bottom: 4px; }
+    .ex-chip.conn .ex-chip-name { color: #e65100; }
+    .ex-chip.comm .ex-chip-name { color: #6a1b9a; }
+    .ex-chip.ecr  .ex-chip-name { color: var(--red); }
+    .ex-chip.pkt  .ex-chip-name { color: #2e7d32; }
+    .ex-chip.tmo  .ex-chip-name { color: var(--primary-dark); }
+    .ex-chip-desc { font-size: 7.5pt; color: var(--text-muted); line-height: 1.5; }
+
+    /* Checklist */
+    .checklist { list-style: none; }
+    .checklist li { display: flex; align-items: flex-start; gap: 9px; padding: 6px 0; font-size: 9pt; border-bottom: 1px solid #f1f2f5; }
+    .checklist li:last-child { border-bottom: none; }
+    .ck-icon { font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+
+    /* Page footer */
+    .page-footer { position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 48px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; color: var(--text-muted); background: white; }
+    .footer-logo { color: var(--primary); font-weight: 700; font-size: 8pt; }
+    .footer-pg { background: var(--primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8pt; font-weight: 700; }
+
+    /* Status table */
+    .status-row { display: flex; gap: 12px; margin-bottom: 10px; }
+    .status-bit { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+    .status-bit .bit-flag { font-family: 'JetBrains Mono', monospace; font-size: 7.5pt; color: var(--primary); font-weight: 700; margin-bottom: 3px; }
+    .status-bit .bit-desc { font-size: 7.5pt; color: var(--text-muted); line-height: 1.4; }
+
+    .payment-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .pay-chip { background: var(--primary-xlight); border: 1px solid #c2d4fa; border-radius: 6px; padding: 5px 12px; font-size: 8pt; display: flex; align-items: center; gap: 6px; }
+    .pay-num { background: var(--primary); color: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7.5pt; font-weight: 800; flex-shrink: 0; }
+
+    /* Example scenario box */
+    .scenario { border: 2px solid var(--primary); border-radius: 14px; margin-bottom: 20px; overflow: hidden; }
+    .scenario-header { background: var(--primary); padding: 12px 20px; display: flex; align-items: center; gap: 12px; }
+    .scenario-num { width: 32px; height: 32px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13pt; font-weight: 900; flex-shrink: 0; }
+    .scenario-title { color: white; font-size: 11pt; font-weight: 700; }
+    .scenario-subtitle { color: rgba(255,255,255,0.7); font-size: 8pt; margin-top: 1px; }
+    .scenario-body { padding: 18px 20px 14px; }
+  </style>
+</head>
+<body>
+
+<!-- ╔═══════════════════════════════╗
+     ║        PAGE 1 — COVER         ║
+     ╚═══════════════════════════════╝ -->
+<div class="page">
+  <div class="cover">
+    <div class="cover-stripe"></div>
+    <div class="cover-circle-1"></div>
+    <div class="cover-circle-2"></div>
+    <div class="cover-circle-3"></div>
+
+    <div class="cover-header">
+      <div class="cover-icon">🧾</div>
+      <div class="cover-brand"><span>MatCash</span>Machine SDK</div>
+    </div>
+
+    <div class="cover-body">
+      <div class="cover-tag">📦 &nbsp; Flutter / Dart Package</div>
+      <div class="cover-title">
+        Πλήρης Οδηγός<br>
+        <span class="hl">Ενσωμάτωσης &</span><br>
+        Αναφοράς API
+      </div>
+      <div class="cover-subtitle">
+        Πλήρης τεκμηρίωση για το Dart package επικοινωνίας με<br>
+        τις φορολογικές ταμειακές MAT MIRKA III / INFOCARINA i57 III<br>
+        μέσω πρωτοκόλλου TCP/IP (MCP v1.1.12).
+      </div>
+      <div class="cover-divider"></div>
+
+      <div class="cover-pills">
+        <div class="cover-pill"><span class="pill-dot"></span> Σύνδεση TCP/IP</div>
+        <div class="cover-pill"><span class="pill-dot"></span> 40+ Εντολές</div>
+        <div class="cover-pill"><span class="pill-dot"></span> Ελληνικοί Χαρακτήρες</div>
+        <div class="cover-pill"><span class="pill-dot"></span> Exception Handling</div>
+        <div class="cover-pill"><span class="pill-dot"></span> Fiscal Reports</div>
+        <div class="cover-pill"><span class="pill-dot"></span> Windows-1253</div>
+      </div>
+
+      <div class="cover-stats">
+        <div class="stat"><div class="stat-num">40<span>+</span></div><div class="stat-label">Εντολές API</div></div>
+        <div class="stat"><div class="stat-num">5</div><div class="stat-label">Τύποι Exception</div></div>
+        <div class="stat"><div class="stat-num">3</div><div class="stat-label">Command Groups</div></div>
+        <div class="stat"><div class="stat-num">v<span>0.1</span></div><div class="stat-label">Τρέχουσα Έκδοση</div></div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div class="cover-footer-left">
+        MatCashMachine SDK<br>
+        Τεχνικό Εγχειρίδιο · MCP Protocol v1.1.12
+      </div>
+      <div class="cover-footer-right">
+        <div class="version-badge">v0.1.0</div>
+        <p>Ιούνιος 2026</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════╗
+     ║          PAGE 2 — TOC          ║
+     ╚═══════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Πίνακας Περιεχομένων</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Πίνακας Περιεχομένων</div>
+    <div class="sec-sub">Οργάνωση της τεκμηρίωσης του package matcashmachine</div>
+
+    <div class="toc-grid">
+      <div class="toc-item"><div class="toc-num">1</div><div class="toc-info"><h4>Αρχιτεκτονική & Εγκατάσταση</h4><p>Δομή του package, pubspec, σύνδεση</p></div></div>
+      <div class="toc-item"><div class="toc-num">2</div><div class="toc-info"><h4>Exception Handling</h4><p>Ιεραρχία σφαλμάτων και πώς να τα διαχειριστείς</p></div></div>
+      <div class="toc-item"><div class="toc-num">3</div><div class="toc-info"><h4>Status — Κατάσταση Ταμειακής</h4><p>DeviceStatus, FiscalStatus bits και ερμηνεία</p></div></div>
+      <div class="toc-item"><div class="toc-num">4</div><div class="toc-info"><h4>Fiscal Commands — Αποδείξεις</h4><p>Άνοιγμα, είδη, πληρωμές, ακύρωση, Z-Report</p></div></div>
+      <div class="toc-item"><div class="toc-num">5</div><div class="toc-info"><h4>Info Commands — Ανάγνωση</h4><p>PLU, τμήματα, ΦΠΑ, φορολογική μνήμη</p></div></div>
+      <div class="toc-item"><div class="toc-num">6</div><div class="toc-info"><h4>Setup Commands — Προγραμματισμός</h4><p>PLU, τμήματα, ΦΠΑ, χαρακτηριστικά εκτυπωτή</p></div></div>
+      <div class="toc-item"><div class="toc-num">7</div><div class="toc-info"><h4>Ελληνικά — Windows-1253</h4><p>Encoding, round-trip, περιορισμοί</p></div></div>
+      <div class="toc-item"><div class="toc-num">8</div><div class="toc-info"><h4>Παραδείγματα Κώδικα</h4><p>Άνοιγμα τραπεζιού, απλή απόδειξη, Z-Closure</p></div></div>
+    </div>
+
+    <div style="margin-top:20px;">
+      <div class="info-box blue">
+        <div class="ib-icon">📦</div>
+        <div class="ib-text">
+          <strong>Προσθήκη στο pubspec.yaml</strong>
+          Το package είναι <strong>pure Dart</strong> (χωρίς Flutter dependency) — μπορεί να χρησιμοποιηθεί σε Flutter, Dart CLI, ή backend.<br>
+          <code style="font-family:'JetBrains Mono',monospace; font-size:8pt; background:#dce8ff; padding:2px 6px; border-radius:4px;">dependencies:</code> &nbsp;→&nbsp;
+          <code style="font-family:'JetBrains Mono',monospace; font-size:8pt; background:#dce8ff; padding:2px 6px; border-radius:4px;">matcashmachine: ^0.1.0</code>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="role-card">
+          <h4>🔌 Υποστηριζόμενες Συνδέσεις</h4>
+          <ul>
+            <li><strong>TCP/IP</strong> — Ethernet ή WiFi (Port 9100 default)</li>
+            <li><strong>MAT MIRKA III</strong> — Πλήρης συμβατότητα</li>
+            <li><strong>INFOCARINA i57 III</strong> — Πλήρης συμβατότητα</li>
+            <li>Πρωτόκολλο MCP v1.1.12</li>
+          </ul>
+        </div>
+        <div class="role-card">
+          <h4>⚡ Βασικές Δυνατότητες</h4>
+          <ul>
+            <li>Πλήρης state machine ENQ/ACK</li>
+            <li>NAK retry με backoff</li>
+            <li>Checksum validation</li>
+            <li>Windows-1253 Ελληνικοί Χαρακτήρες</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">2</div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║   PAGE 3 — Architecture & Exceptions  ║
+     ╚═══════════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Αρχιτεκτονική & Exceptions</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Αρχιτεκτονική & Exception Handling</div>
+    <div class="sec-sub">Δομή layers και πώς να χειριστείς σφάλματα στην εφαρμογή σου</div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-badge">1</div>
+        <div><div class="step-title">Δομή Layers</div><div class="step-desc">Πώς οργανώνεται εσωτερικά το package</div></div>
+      </div>
+      <div class="step-body">
+        <div class="three-col">
+          <div class="role-card">
+            <h4>🎯 MatProtocol (API)</h4>
+            <ul>
+              <li>Κύριο σημείο εισόδου</li>
+              <li><code class="ci">sendPayment()</code></li>
+              <li><code class="ci">itemSale()</code></li>
+              <li><code class="ci">issueZReport()</code></li>
+              <li><code class="ci">getStatus()</code></li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <h4>⚙️ ProtocolHandler</h4>
+            <ul>
+              <li>State machine ENQ→ACK</li>
+              <li>Retry logic (3 φορές)</li>
+              <li>NAK handling</li>
+              <li>Hard deadline timeout</li>
+              <li>Byte-level parsing</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <h4>🔌 TcpConnection</h4>
+            <ul>
+              <li>Socket.connect()</li>
+              <li>Broadcast stream</li>
+              <li>Error wrapping</li>
+              <li>Async dispose</li>
+              <li>5s connect timeout</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-badge">2</div>
+        <div><div class="step-title">Ιεραρχία Exceptions</div><div class="step-desc">Πέντε τύποι σφαλμάτων — πιάσε αυτό που χρειάζεσαι</div></div>
+      </div>
+      <div class="step-body">
+        <div class="ex-grid">
+          <div class="ex-chip conn">
+            <div class="ex-chip-name">MatConnectionException</div>
+            <div class="ex-chip-desc">Socket δεν συνδέθηκε ή έπεσε κατά τη διάρκεια επικοινωνίας. Δεν κάνει retry — διαδίδεται αμέσως.</div>
+          </div>
+          <div class="ex-chip comm">
+            <div class="ex-chip-name">MatCommunicationException</div>
+            <div class="ex-chip-desc">Ταμειακή επέστρεψε NAK ή δεν έκανε ACK στο handshake. Προκαλεί retry.</div>
+          </div>
+          <div class="ex-chip ecr">
+            <div class="ex-chip-name">MatEcrErrorException</div>
+            <div class="ex-chip-desc">Η ταμειακή επέστρεψε κωδικό σφάλματος (π.χ. '06'=κλειστή απόδειξη). Περιέχει <code class="ci red">errorCode</code> και <code class="ci red">command</code>.</div>
+          </div>
+          <div class="ex-chip pkt">
+            <div class="ex-chip-name">MatPacketException</div>
+            <div class="ex-chip-desc">Λάθος checksum ή κακή μορφή πακέτου. Στέλνει NAK στην ταμειακή και κάνει retry.</div>
+          </div>
+          <div class="ex-chip tmo">
+            <div class="ex-chip-name">MatTimeoutException</div>
+            <div class="ex-chip-desc">Η ταμειακή δεν απάντησε εντός 10s (default). Προκαλεί retry με 800ms backoff.</div>
+          </div>
+          <div class="ex-chip conn" style="background:#fafbfc; border-color:#dfe1e6;">
+            <div class="ex-chip-name" style="color:#42526e;">MatException (βάση)</div>
+            <div class="ex-chip-desc">Κοινή βάση όλων. Πιάσε μόνο αυτό αν θες να χειριστείς ΟΛΑ τα σφάλματα με ένα catch.</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="cb-label">Dart</div>
+<span class="line"><span class="kw">try</span> <span class="punc">{</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">itemSale</span><span class="punc">(</span><span class="num">2.50</span><span class="punc">,</span> description<span class="punc">:</span> <span class="str">'ΚΑΦΕΣ'</span><span class="punc">,</span> department<span class="punc">:</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">sendPayment</span><span class="punc">(</span><span class="num">2.50</span><span class="punc">,</span> paymentCode<span class="punc">:</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line"><span class="punc">}</span> <span class="kw">on</span> <span class="cls">MatEcrErrorException</span> <span class="kw">catch</span> <span class="punc">(</span><span class="var">e</span><span class="punc">) {</span></span>
+<span class="line">  <span class="cmt">// Η ταμειακή είπε "όχι" — κωδικός e.errorCode, εντολή e.command</span></span>
+<span class="line">  <span class="fn">print</span><span class="punc">(</span><span class="str">'ECR Error </span><span class="punc">${</span><span class="var">e</span><span class="punc">.</span><span class="var">errorCode</span><span class="punc">}</span><span class="str">: </span><span class="punc">${</span><span class="var">e</span><span class="punc">.</span><span class="var">message</span><span class="punc">}</span><span class="str">'</span><span class="punc">);</span></span>
+<span class="line"><span class="punc">}</span> <span class="kw">on</span> <span class="cls">MatTimeoutException</span> <span class="kw">catch</span> <span class="punc">(</span><span class="var">e</span><span class="punc">) {</span></span>
+<span class="line">  <span class="fn">print</span><span class="punc">(</span><span class="str">'Timeout: </span><span class="punc">$e</span><span class="str">'</span><span class="punc">);</span>  <span class="cmt">// Ελέγξε το δίκτυο</span></span>
+<span class="line"><span class="punc">}</span> <span class="kw">on</span> <span class="cls">MatConnectionException</span> <span class="kw">catch</span> <span class="punc">(</span><span class="var">e</span><span class="punc">) {</span></span>
+<span class="line">  <span class="fn">print</span><span class="punc">(</span><span class="str">'Σύνδεση χαμένη: </span><span class="punc">$e</span><span class="str">'</span><span class="punc">);</span>  <span class="cmt">// Reconnect</span></span>
+<span class="line"><span class="punc">}</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">3</div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════╗
+     ║   PAGE 4 — Status & Fiscal Cmds  ║
+     ╚═══════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Status & Fiscal Commands</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Status & Fiscal Commands</div>
+    <div class="sec-sub">Κατάσταση ταμειακής και εντολές φορολογικών αποδείξεων</div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-badge">3</div>
+        <div><div class="step-title">getStatus() — MatStatus</div><div class="step-desc">Διαβάζει την τρέχουσα κατάσταση της ταμειακής (Εντολή '?')</div></div>
+      </div>
+      <div class="step-body">
+        <div class="two-col">
+          <div>
+            <p style="font-size:8.5pt; font-weight:700; color:var(--primary-dark); margin-bottom:8px;">DeviceStatus bits</p>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">deviceBusy</div><div class="bit-desc">Ταμειακή απασχολημένη</div></div>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">printerPaperEnd</div><div class="bit-desc">Τέλος χαρτιού</div></div>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">printerOffline</div><div class="bit-desc">Εκτυπωτής offline</div></div>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">cutterError</div><div class="bit-desc">Σφάλμα κόπτη</div></div>
+          </div>
+          <div>
+            <p style="font-size:8.5pt; font-weight:700; color:var(--primary-dark); margin-bottom:8px;">FiscalStatus bits</p>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">dayIsOpen</div><div class="bit-desc">Ημέρα ανοιχτή (Z δεν έχει γίνει)</div></div>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">transactionOpen</div><div class="bit-desc">Απόδειξη ανοιχτή</div></div>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">transactionInPayment</div><div class="bit-desc">Απόδειξη σε φάση πληρωμής</div></div>
+            <div class="status-bit" style="margin-bottom:5px;"><div class="bit-flag">drawerIsOpen</div><div class="bit-desc">Συρτάρι ανοιχτό</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-badge">4</div>
+        <div><div class="step-title">Fiscal Commands — Εντολές Αποδείξεων</div><div class="step-desc">Πλήρης λίστα εντολών για διαχείριση αποδείξεων και εκθέσεων</div></div>
+      </div>
+      <div class="step-body">
+        <table class="cmd-table">
+          <thead>
+            <tr><th style="width:28%">Μέθοδος</th><th style="width:8%">Εντ.</th><th>Περιγραφή</th><th style="width:20%">Επιστρέφει / Ρίχνει</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="method">setActiveClerkCommand(int)</td>
+              <td><span class="code-letter">'1'</span></td>
+              <td class="desc">Ορίζει ενεργό χειριστή (clerk) πριν το άνοιγμα απόδειξης. <strong>Πρέπει να καλείται πρώτα.</strong></td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">executeItemSale(op, desc, qty, price, dept)</td>
+              <td><span class="code-letter">'3'</span></td>
+              <td class="desc">Καταχώρηση γραμμής είδους. op='S' για πώληση, op='R' για επιστροφή. <strong>Ανοίγει αυτόματα την απόδειξη</strong> αν είναι κλειστή.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">executeDiscountMarkup(amount, desc, code, mode, spec)</td>
+              <td><span class="code-letter">'4'</span></td>
+              <td class="desc">Έκπτωση/προσαύξηση σε τελευταίο είδος ή υποσύνολο. code=1 έκπτωση, code=2 προσαύξηση.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">executePayment(type, amount, desc, shorthand)</td>
+              <td><span class="code-letter">'5'</span></td>
+              <td class="desc">Εκτέλεση πληρωμής. <strong>Κλείνει και εκτυπώνει την απόδειξη.</strong> fields[0] = ρέστα αν type=1.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">calculateSubtotal()</td>
+              <td><span class="code-letter">'U'</span></td>
+              <td class="desc">Υπολογίζει και εμφανίζει ενδιάμεσο σύνολο. Δεν κλείνει την απόδειξη.</td>
+              <td class="returns">MatReplyPacket</td>
+            </tr>
+            <tr>
+              <td class="method">cancelReceipt()</td>
+              <td><span class="code-letter">'+'</span></td>
+              <td class="desc">Ακύρωση ανοιχτής απόδειξης. Εκτυπώνει ΑΚΥΡΩΣΗ.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">openCashInOut(type, prepaymentType)</td>
+              <td><span class="code-letter">'6'</span></td>
+              <td class="desc">Εισαγωγή/εξαγωγή μετρητών. type=1 cash-in, type=2 cash-out.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">executeIssueReport(int type)</td>
+              <td><span class="code-letter">'x'</span></td>
+              <td class="desc">Έκδοση αναφοράς. <strong>type=1</strong> X-report (χωρίς μηδενισμό), <strong>type=7</strong> Z-report (ημερήσιο κλείσιμο).</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">tableCommand(type, tableIndex)</td>
+              <td><span class="code-letter">'&amp;'</span></td>
+              <td class="desc">Διαχείριση τραπεζιών. type=1 άνοιγμα, type=2 κλείσιμο/μεταφορά σε απόδειξη, type=3 επιστροφή.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">openDrawerCommand()</td>
+              <td><span class="code-letter">'q'</span></td>
+              <td class="desc">Άνοιγμα συρταριού χωρίς εκτύπωση.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">printerFeed(int lines)</td>
+              <td><span class="code-letter">'w'</span></td>
+              <td class="desc">Προώθηση χαρτιού κατά n γραμμές.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">printSDReport(start, end, output)</td>
+              <td><span class="code-letter">'@'</span></td>
+              <td class="desc">Εκτύπωση αποδείξεων από SD journal (εντός εύρους αριθμών).</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">saleOfCoupon(n, amount, desc, barcode)</td>
+              <td><span class="code-letter">'Z'</span></td>
+              <td class="desc">Πώληση κουπονιού με barcode.</td>
+              <td class="returns">MatReplyPacket<br><span class="throws">→ MatEcrErrorException</span></td>
+            </tr>
+            <tr>
+              <td class="method">displayScrollMessage(msg)</td>
+              <td><span class="code-letter">'o'</span></td>
+              <td class="desc">Εμφάνιση κυλιόμενου μηνύματος στο LCD. Best-effort (δεν ρίχνει exception).</td>
+              <td class="returns">MatReplyPacket</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="margin-bottom:0;">
+          <p style="font-size:8.5pt; font-weight:700; color:var(--primary-dark); margin-bottom:8px;">Κωδικοί Τρόπων Πληρωμής (executePayment type)</p>
+          <div class="payment-row">
+            <div class="pay-chip"><div class="pay-num">1</div> Μετρητά</div>
+            <div class="pay-chip"><div class="pay-num">2</div> Κάρτα</div>
+            <div class="pay-chip"><div class="pay-num">3</div> Επιταγή</div>
+            <div class="pay-chip"><div class="pay-num">4</div> Πίστωση</div>
+            <div class="pay-chip"><div class="pay-num">5</div> Συνάλλαγμα</div>
+            <div class="pay-chip"><div class="pay-num">6</div> Κουπόνι</div>
+            <div class="pay-chip"><div class="pay-num">7</div> Προπληρωμή</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">4</div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════╗
+     ║   PAGE 5 — Info Commands          ║
+     ╚═══════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Info Commands — Ανάγνωση</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Info Commands — Ανάγνωση Δεδομένων</div>
+    <div class="sec-sub">Εντολές ανάγνωσης που δεν αλλάζουν φορολογική κατάσταση — πάντα επιστρέφουν MatReplyPacket</div>
+
+    <div class="info-box green">
+      <div class="ib-icon">✅</div>
+      <div class="ib-text">
+        <strong>Σημαντικό:</strong> Οι Info Commands <strong>δεν ρίχνουν exception</strong> αν η ταμειακή επιστρέψει error — επιστρέφουν πάντα το <code class="ci green">MatReplyPacket</code>. Ελέγξτε το <code class="ci green">reply.isSuccess</code> αν θέλετε να χειριστείτε σφάλμα.
+      </div>
+    </div>
+
+    <table class="cmd-table">
+      <thead>
+        <tr><th style="width:30%">Μέθοδος</th><th style="width:8%">Εντ.</th><th>Περιγραφή</th><th style="width:22%">Πεδία Απάντησης</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="method">getStatus()</td>
+          <td><span class="code-letter">'?'</span></td>
+          <td class="desc">Κατάσταση συσκευής και φορολογική κατάσταση.</td>
+          <td class="returns">MatStatus (DeviceStatus + FiscalStatus)</td>
+        </tr>
+        <tr>
+          <td class="method">readECRIdentification()</td>
+          <td><span class="code-letter">'a'</span></td>
+          <td class="desc">Αναγνωριστικό string της ταμειακής (μοντέλο, S/N).</td>
+          <td class="returns">fields[0]=model, [1]=serial</td>
+        </tr>
+        <tr>
+          <td class="method">readVersionInfo()</td>
+          <td><span class="code-letter">'v'</span></td>
+          <td class="desc">Έκδοση firmware της ταμειακής.</td>
+          <td class="returns">fields[0]=version</td>
+        </tr>
+        <tr>
+          <td class="method">readPLUInfo(String pluNumber)</td>
+          <td><span class="code-letter">'p'</span></td>
+          <td class="desc">Πληροφορίες PLU με αριθμό PLU.</td>
+          <td class="returns">fields: desc, dept, price, barcode</td>
+        </tr>
+        <tr>
+          <td class="method">readPLUInfoByCode(String code)</td>
+          <td><span class="code-letter">'h'</span></td>
+          <td class="desc">Πληροφορίες PLU με barcode/κωδικό.</td>
+          <td class="returns">fields: desc, dept, price</td>
+        </tr>
+        <tr>
+          <td class="method">readDPTInfo(int dptNumber)</td>
+          <td><span class="code-letter">'d'</span></td>
+          <td class="desc">Στοιχεία τμήματος (DPT): όνομα, ΦΠΑ, σύνολα.</td>
+          <td class="returns">fields: name, vat, totals</td>
+        </tr>
+        <tr>
+          <td class="method">readCategory(int categoryIndex)</td>
+          <td><span class="code-letter">'Q'</span></td>
+          <td class="desc">Στοιχεία κατηγορίας.</td>
+          <td class="returns">fields: name, code</td>
+        </tr>
+        <tr>
+          <td class="method">readVATRates()</td>
+          <td><span class="code-letter">'e'</span></td>
+          <td class="desc">Τρέχοντες συντελεστές ΦΠΑ (A, B, C, D, E).</td>
+          <td class="returns">fields[0..4]: ποσοστά %</td>
+        </tr>
+        <tr>
+          <td class="method">readClerkInfo(int clerkNumber)</td>
+          <td><span class="code-letter">'c'</span></td>
+          <td class="desc">Στοιχεία χειριστή: όνομα, κωδικός πρόσβασης.</td>
+          <td class="returns">fields: name, password</td>
+        </tr>
+        <tr>
+          <td class="method">readPaymentInfo(int paymentCode)</td>
+          <td><span class="code-letter">'y'</span></td>
+          <td class="desc">Στοιχεία τρόπου πληρωμής.</td>
+          <td class="returns">fields: name, totals</td>
+        </tr>
+        <tr>
+          <td class="method">readTransactionTotals()</td>
+          <td><span class="code-letter">'9'</span></td>
+          <td class="desc">Σύνολα τρέχουσας ημέρας (Χ-τύπος).</td>
+          <td class="returns">fields: totals per VAT</td>
+        </tr>
+        <tr>
+          <td class="method">readDailyTotals()</td>
+          <td><span class="code-letter">'0'</span></td>
+          <td class="desc">Γενικά ημερήσια σύνολα.</td>
+          <td class="returns">fields: grand totals</td>
+        </tr>
+        <tr>
+          <td class="method">readRealTimeClock()</td>
+          <td><span class="code-letter">'t'</span></td>
+          <td class="desc">Ημερομηνία/ώρα από το RTC της ταμειακής.</td>
+          <td class="returns">fields[0]=datetime string</td>
+        </tr>
+        <tr>
+          <td class="method">readFiscalFileInfo()</td>
+          <td><span class="code-letter">'g'</span></td>
+          <td class="desc">Πληροφορίες φορολογικής μνήμης (FM): πλήρωση, Z-counter.</td>
+          <td class="returns">fields: FM info</td>
+        </tr>
+        <tr>
+          <td class="method">readFiscalRecord(type, record)</td>
+          <td><span class="code-letter">'r'</span></td>
+          <td class="desc">Ανάγνωση εγγραφής φορολογικής μνήμης. record=4-digit.</td>
+          <td class="returns">fields: fiscal record data</td>
+        </tr>
+        <tr>
+          <td class="method">readLastFiscalData()</td>
+          <td><span class="code-letter">'i'</span></td>
+          <td class="desc">Τελευταία φορολογική εγγραφή (τελευταίο Z).</td>
+          <td class="returns">fields: last Z data</td>
+        </tr>
+        <tr>
+          <td class="method">readCustomerData(code, index)</td>
+          <td><span class="code-letter">'%'</span></td>
+          <td class="desc">Στοιχεία πελάτη από μνήμη.</td>
+          <td class="returns">fields: customer data</td>
+        </tr>
+        <tr>
+          <td class="method">readDailySoldPLU()</td>
+          <td><span class="code-letter">'k'</span></td>
+          <td class="desc">Πληροφορίες ημερήσιων πωλήσεων PLU.</td>
+          <td class="returns">fields: PLU sales data</td>
+        </tr>
+        <tr>
+          <td class="method">readECRParameters()</td>
+          <td><span class="code-letter">'s'</span></td>
+          <td class="desc">Παράμετροι διαμόρφωσης της ταμειακής.</td>
+          <td class="returns">fields: config params</td>
+        </tr>
+        <tr>
+          <td class="method">generalRead(int type)</td>
+          <td><span class="code-letter">','</span></td>
+          <td class="desc">Γενική ανάγνωση πολλαπλών τύπων δεδομένων.</td>
+          <td class="returns">MatReplyPacket</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">5</div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════╗
+     ║   PAGE 6 — Setup Commands         ║
+     ╚═══════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Setup Commands — Προγραμματισμός</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Setup Commands — Προγραμματισμός Ταμειακής</div>
+    <div class="sec-sub">Εντολές διαμόρφωσης: PLU, τμήματα, ΦΠΑ, κεφαλίδες, χρήστες</div>
+
+    <div class="info-box orange">
+      <div class="ib-icon">⚠️</div>
+      <div class="ib-text">
+        <strong>Προσοχή:</strong> Οι Setup Commands <strong>ρίχνουν MatEcrErrorException</strong> αν η ταμειακή επιστρέψει σφάλμα. Χρησιμοποιούνται κυρίως κατά την αρχική διαμόρφωση της ταμειακής, όχι κατά τη λειτουργία.
+      </div>
+    </div>
+
+    <table class="cmd-table">
+      <thead>
+        <tr><th style="width:32%">Μέθοδος</th><th style="width:8%">Εντ.</th><th>Περιγραφή & Παράμετροι</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="method">programPLU(idx, barcode, desc, dept, price)</td>
+          <td><span class="code-letter">'P'</span></td>
+          <td class="desc">Καταχώρηση PLU με αριθμό PLU. Όλα τα πεδία απαιτούνται.</td>
+        </tr>
+        <tr>
+          <td class="method">programPLUWithBarcode(barcode, desc, dept, price)</td>
+          <td><span class="code-letter">'A'</span></td>
+          <td class="desc">Καταχώρηση PLU με barcode ως primary key.</td>
+        </tr>
+        <tr>
+          <td class="method">programDPT(index, description, vatRate)</td>
+          <td><span class="code-letter">'D'</span></td>
+          <td class="desc">Προγραμματισμός τμήματος. vatRate=1..5 (A..E).</td>
+        </tr>
+        <tr>
+          <td class="method">programVATRates(vatA, vatB, vatC, vatD, vatE)</td>
+          <td><span class="code-letter">'b'</span></td>
+          <td class="desc">Ορισμός και των 5 συντελεστών ΦΠΑ ταυτόχρονα (σε %).</td>
+        </tr>
+        <tr>
+          <td class="method">programClerk(index, description, password)</td>
+          <td><span class="code-letter">'C'</span></td>
+          <td class="desc">Δημιουργία/ενημέρωση χειριστή με 4-ψήφιο κωδικό.</td>
+        </tr>
+        <tr>
+          <td class="method">programPaymentType(index, description)</td>
+          <td><span class="code-letter">'Y'</span></td>
+          <td class="desc">Τροποποίηση ονόματος τρόπου πληρωμής (1-7).</td>
+        </tr>
+        <tr>
+          <td class="method">programHeader(List&lt;String&gt; lines)</td>
+          <td><span class="code-letter">'H'</span></td>
+          <td class="desc">Ορισμός γραμμών κεφαλίδας απόδειξης. Τουλάχιστον 1 γραμμή.</td>
+        </tr>
+        <tr>
+          <td class="method">programFooter(List&lt;String&gt; lines)</td>
+          <td><span class="code-letter">'F'</span></td>
+          <td class="desc">Ορισμός γραμμών υποσέλιδου απόδειξης.</td>
+        </tr>
+        <tr>
+          <td class="method">programScrollingMessage(msg, showScroll, showDateTime, delay)</td>
+          <td><span class="code-letter">'M'</span></td>
+          <td class="desc">Ρύθμιση κυλιόμενου μηνύματος LCD και ημερομηνίας/ώρας.</td>
+        </tr>
+        <tr>
+          <td class="method">programECRParameters(String parameters)</td>
+          <td><span class="code-letter">'S'</span></td>
+          <td class="desc">Προγραμματισμός παγκόσμιων παραμέτρων ECR (πολύ-πεδία).</td>
+        </tr>
+        <tr>
+          <td class="method">programDiscountMarkup(idx, desc, type, isPct, app)</td>
+          <td><span class="code-letter">'u'</span></td>
+          <td class="desc">Προεπιλεγμένη έκπτωση/προσαύξηση. isPct=1 ποσοστό.</td>
+        </tr>
+        <tr>
+          <td class="method">programCategory(index, description)</td>
+          <td><span class="code-letter">'R'</span></td>
+          <td class="desc">Δημιουργία/ενημέρωση κατηγορίας.</td>
+        </tr>
+        <tr>
+          <td class="method">programClient(index, clientCode, description, {extraFields})</td>
+          <td><span class="code-letter">'!'</span></td>
+          <td class="desc">Εγγραφή πελάτη. Υποστηρίζει έως 28 επιπλέον πεδία.</td>
+        </tr>
+        <tr>
+          <td class="method">programKeyboard(number, level, functionId)</td>
+          <td><span class="code-letter">'G'</span></td>
+          <td class="desc">Προγραμματισμός πλήκτρου συντόμευσης πληκτρολογίου.</td>
+        </tr>
+        <tr>
+          <td class="method">programGSISSettings(enable, url, port, aesKey)</td>
+          <td><span class="code-letter">']'</span></td>
+          <td class="desc">Ρύθμιση ΑΑΔΕ/ΓΓΠΣ ολοκλήρωσης (MyDATA).</td>
+        </tr>
+        <tr>
+          <td class="method">setOnlineProtocol(bool enable)</td>
+          <td><span class="code-letter">'n'</span></td>
+          <td class="desc">Ενεργοποίηση/απενεργοποίηση online πρωτοκόλλου.</td>
+        </tr>
+        <tr>
+          <td class="method">setGetInvoiceParameters(operation, row)</td>
+          <td><span class="code-letter">';'</span></td>
+          <td class="desc">Ανάγνωση (op=0) ή εγγραφή (op=1) παραμέτρων τιμολογίου.</td>
+        </tr>
+        <tr>
+          <td class="method">generalProgramming(type, List&lt;String&gt; params)</td>
+          <td><span class="code-letter">'\'</span></td>
+          <td class="desc">Γενικός προγραμματισμός — για εντολές που δεν καλύπτονται αλλιώς.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">6</div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════╗
+     ║   PAGE 7 — Greek & Connection     ║
+     ╚═══════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Ελληνικά & Σύνδεση</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Ελληνικά & Σύνδεση</div>
+    <div class="sec-sub">Windows-1253 encoding και βασική χρήση του MatProtocol</div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-badge">7</div>
+        <div><div class="step-title">Ελληνικοί Χαρακτήρες — Windows-1253 (CP1253)</div><div class="step-desc">Πλήρης υποστήριξη Ελληνικών στις περιγραφές ειδών, κεφαλίδες, μηνύματα</div></div>
+      </div>
+      <div class="step-body">
+        <div class="two-col" style="margin-bottom:12px;">
+          <div class="role-card">
+            <h4>🇬🇷 Υποστηριζόμενοι Χαρακτήρες</h4>
+            <ul>
+              <li>Κεφαλαία με τόνο: Ά Έ Ή Ί Ό Ύ Ώ</li>
+              <li>Μικρά με τόνο: ά έ ή ί ό ύ ώ</li>
+              <li>Όλο το ελληνικό αλφάβητο Α-Ω, α-ω</li>
+              <li>Ευρώ: € (byte 0x80)</li>
+              <li>Διαλυτικά: Ϊ Ϋ ΐ ΰ ϊ ϋ</li>
+            </ul>
+          </div>
+          <div class="role-card">
+            <h4>⚠️ Δεν Υποστηρίζεται</h4>
+            <ul>
+              <li>Unicode εκτός Windows-1253 (π.χ. Κινεζικά)</li>
+              <li>Emoji 😀 (μη encodable)</li>
+              <li>Ειδικά σύμβολα εκτός πίνακα</li>
+              <li>UTF-8 multi-byte sequences</li>
+              <li>Αν σταλεί μη-encodable → MatPacketException</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="cb-label">Dart</div>
+<span class="line"><span class="cmt">// Ορισμός κεφαλίδας απόδειξης στα Ελληνικά</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">programHeader</span><span class="punc">([</span></span>
+<span class="line">  <span class="str">'ΚΑΦΕΤΕΡΙΑ ΑΚΡΟΠΟΛΗ'</span><span class="punc">,</span></span>
+<span class="line">  <span class="str">'ΑΦΜ: 123456789 — ΔΟΥ Αθηνών'</span><span class="punc">,</span></span>
+<span class="line">  <span class="str">'Τηλ: 210-1234567'</span><span class="punc">,</span></span>
+<span class="line"><span class="punc">]);</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">// Πώληση είδους στα Ελληνικά — δουλεύει αυτόματα!</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">itemSale</span><span class="punc">(</span><span class="num">2.50</span><span class="punc">,</span> description<span class="punc">:</span> <span class="str">'ΚΑΦΕΣ ESPRESSO'</span><span class="punc">,</span> department<span class="punc">:</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">// Για ASCII-only ταμειακές (μη-ελληνικές)</span></span>
+<span class="line"><span class="kw">final</span> <span class="var">mat</span> <span class="punc">=</span> <span class="cls">MatProtocol</span><span class="punc">(</span>host<span class="punc">:</span> <span class="str">'192.168.1.100'</span><span class="punc">,</span> port<span class="punc">:</span> <span class="num">9100</span><span class="punc">,</span></span>
+<span class="line">    charset<span class="punc">:</span> <span class="cls">MatCharset</span><span class="punc">.</span><span class="var">ascii</span><span class="punc">);</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-badge">★</div>
+        <div><div class="step-title">Βασική Χρήση MatProtocol</div><div class="step-desc">Σύνδεση, lifecycle, raw commands</div></div>
+      </div>
+      <div class="step-body">
+        <div class="code-block">
+          <div class="cb-label">Dart</div>
+<span class="line"><span class="cmt">// 1. Δημιουργία — default charset: Windows-1253 (Ελληνικά)</span></span>
+<span class="line"><span class="kw">final</span> <span class="var">mat</span> <span class="punc">=</span> <span class="cls">MatProtocol</span><span class="punc">(</span>host<span class="punc">:</span> <span class="str">'192.168.1.100'</span><span class="punc">,</span> port<span class="punc">:</span> <span class="num">9100</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">// 2. Σύνδεση (throws MatConnectionException αν αποτύχει)</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">connect</span><span class="punc">();</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">// 3. Κανονική χρήση...</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">// 4. Αποσύνδεση και αποδέσμευση πόρων</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">disconnect</span><span class="punc">();</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">dispose</span><span class="punc">();</span>  <span class="cmt">// ΠΑΝΤΑ await — είναι async</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">// Raw command για εντολές που δεν έχουν named method</span></span>
+<span class="line"><span class="kw">final</span> <span class="var">reply</span> <span class="punc">=</span> <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">sendRawCommand</span><span class="punc">(</span></span>
+<span class="line">  <span class="cls">MatPacket</span><span class="punc">(</span>requestCode<span class="punc">:</span> <span class="str">'T'</span><span class="punc">,</span> fields<span class="punc">: [</span><span class="str">'1'</span><span class="punc">,</span> <span class="str">'23:59:00'</span><span class="punc">]),</span></span>
+<span class="line">  replyTimeout<span class="punc">:</span> <span class="kw">const</span> <span class="cls">Duration</span><span class="punc">(</span>seconds<span class="punc">:</span> <span class="num">30</span><span class="punc">),</span> <span class="cmt">// π.χ. για Z-report</span></span>
+<span class="line"><span class="punc">);</span></span>
+<span class="line"><span class="kw">if</span> <span class="punc">(!</span><span class="var">reply</span><span class="punc">.</span><span class="var">isSuccess</span><span class="punc">)</span> <span class="fn">print</span><span class="punc">(</span><span class="var">reply</span><span class="punc">.</span><span class="var">replyDescription</span><span class="punc">);</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">7</div>
+  </div>
+</div>
+
+<!-- ╔════════════════════════════════════════╗
+     ║   PAGE 8 — Examples Part 1            ║
+     ╚════════════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Παραδείγματα — Τραπέζι & Απόδειξη</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Πρακτικά Παραδείγματα Κώδικα</div>
+    <div class="sec-sub">Πλήρη, έτοιμα προς χρήση σενάρια από την καθημερινή λειτουργία</div>
+
+    <!-- EXAMPLE 1: Άνοιγμα Τραπεζιού -->
+    <div class="scenario">
+      <div class="scenario-header">
+        <div class="scenario-num">1</div>
+        <div>
+          <div class="scenario-title">Άνοιγμα & Κλείσιμο Τραπεζιού (Table Management)</div>
+          <div class="scenario-subtitle">Εστιατόριο: Παραγγελία σε τραπέζι → μεταφορά σε απόδειξη → πληρωμή</div>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="info-box blue" style="margin-bottom:10px;">
+          <div class="ib-icon">💡</div>
+          <div class="ib-text">Η εντολή <code class="ci">tableCommand(type, index)</code> χρησιμοποιεί type: <strong>1=άνοιγμα</strong>, <strong>2=κλείσιμο/μεταφορά σε απόδειξη</strong>, <strong>3=επιστροφή/ακύρωση</strong>, <strong>4=πληροφορίες</strong>.</div>
+        </div>
+
+        <div class="code-block">
+          <div class="cb-label">Dart</div>
+<span class="line"><span class="cmt">/// ΒΗΜΑ 1: Ορισμός ενεργού χειριστή</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">setActiveClerkCommand</span><span class="punc">(</span><span class="num">1</span><span class="punc">);</span>  <span class="cmt">// Χειριστής #1</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">/// ΒΗΜΑ 2: Άνοιγμα τραπεζιού (π.χ. τραπέζι #5)</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">tableCommand</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span> <span class="num">5</span><span class="punc">);</span>  <span class="cmt">// type=1 (άνοιγμα), tableIndex=5</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">/// ΒΗΜΑ 3: Καταχώρηση παραγγελιών στο τραπέζι</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeItemSale</span><span class="punc">(</span><span class="str">'S'</span><span class="punc">,</span> <span class="str">'ΚΑΦΕΣ ESPRESSO'</span><span class="punc">,</span>  <span class="num">2.0</span><span class="punc">,</span> <span class="num">2.50</span><span class="punc">,</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeItemSale</span><span class="punc">(</span><span class="str">'S'</span><span class="punc">,</span> <span class="str">'ΧΥΜΟΣ ΠΟΡΤΟΚΑΛΙ'</span><span class="punc">,</span> <span class="num">1.0</span><span class="punc">,</span> <span class="num">3.80</span><span class="punc">,</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeItemSale</span><span class="punc">(</span><span class="str">'S'</span><span class="punc">,</span> <span class="str">'ΤΟΣΤ ΜΙΞΤΟ'</span><span class="punc">,</span>       <span class="num">1.0</span><span class="punc">,</span> <span class="num">4.50</span><span class="punc">,</span> <span class="num">2</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">/// ΒΗΜΑ 4: Κλείσιμο τραπεζιού — μεταφέρει σε ανοιχτή απόδειξη</span></span>
+<span class="line"><span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">tableCommand</span><span class="punc">(</span><span class="num">2</span><span class="punc">,</span> <span class="num">5</span><span class="punc">);</span>  <span class="cmt">// type=2 (κλείσιμο/μεταφορά)</span></span>
+<span class="line"></span>
+<span class="line"><span class="cmt">/// ΒΗΜΑ 5: Πληρωμή με κάρτα (type=2)</span></span>
+<span class="line"><span class="kw">final</span> <span class="var">payReply</span> <span class="punc">=</span> <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executePayment</span><span class="punc">(</span><span class="num">2</span><span class="punc">,</span> <span class="num">10.80</span><span class="punc">,</span> <span class="str">'VISA'</span><span class="punc">,</span> <span class="str">'****1234'</span><span class="punc">);</span></span>
+<span class="line"><span class="cmt">// Η απόδειξη εκτυπώνεται αυτόματα!</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXAMPLE 2: Απλή Απόδειξη -->
+    <div class="scenario">
+      <div class="scenario-header">
+        <div class="scenario-num">2</div>
+        <div>
+          <div class="scenario-title">Απλή Φορολογική Απόδειξη (Χωρίς Τραπέζι)</div>
+          <div class="scenario-subtitle">Ταμείο: Πώληση ειδών → έκπτωση → πληρωμή μετρητοίς</div>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="code-block">
+          <div class="cb-label">Dart</div>
+<span class="line"><span class="cmt">/// Πλήρης κύκλος απόδειξης με exception handling</span></span>
+<span class="line"><span class="kw">Future</span><span class="punc">&lt;</span><span class="kw">void</span><span class="punc">&gt;</span> <span class="fn">issueReceipt</span><span class="punc">(</span><span class="cls">MatProtocol</span> <span class="var">mat</span><span class="punc">) async {</span></span>
+<span class="line">  <span class="kw">try</span> <span class="punc">{</span></span>
+<span class="line">    <span class="cmt">// 1. Ενεργός χειριστής</span></span>
+<span class="line">    <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">setActiveClerkCommand</span><span class="punc">(</span><span class="num">1</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line">    <span class="cmt">// 2. Είδη — η απόδειξη ανοίγει αυτόματα στο 1ο executeItemSale</span></span>
+<span class="line">    <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeItemSale</span><span class="punc">(</span><span class="str">'S'</span><span class="punc">,</span> <span class="str">'ΑΝΑΨΥΚΤΙΚΟ COLA'</span><span class="punc">,</span> <span class="num">2.0</span><span class="punc">,</span> <span class="num">1.50</span><span class="punc">,</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line">    <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeItemSale</span><span class="punc">(</span><span class="str">'S'</span><span class="punc">,</span> <span class="str">'ΣΑΝΤΟΥΙΤΣ ΓΑΛΟΠΟΥΛΑ'</span><span class="punc">,</span> <span class="num">1.0</span><span class="punc">,</span> <span class="num">4.20</span><span class="punc">,</span> <span class="num">2</span><span class="punc">);</span></span>
+<span class="line">    <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeItemSale</span><span class="punc">(</span><span class="str">'S'</span><span class="punc">,</span> <span class="str">'ΝΕΡΟ 500ml'</span><span class="punc">,</span>      <span class="num">1.0</span><span class="punc">,</span> <span class="num">0.80</span><span class="punc">,</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line">    <span class="cmt">// 3. Προαιρετική έκπτωση 10% στο σύνολο</span></span>
+<span class="line">    <span class="cmt">// executeDiscountMarkup(amount, desc, code, mode, specifier)</span></span>
+<span class="line">    <span class="cmt">// code=1 έκπτωση, mode=1 ποσοστό, specifier=1 στο σύνολο</span></span>
+<span class="line">    <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeDiscountMarkup</span><span class="punc">(</span><span class="num">10.0</span><span class="punc">,</span> <span class="str">'ΕΚΠΤΩΣΗ ΜΕΛΟΥΣ'</span><span class="punc">,</span> <span class="num">1</span><span class="punc">,</span> <span class="num">1</span><span class="punc">,</span> <span class="num">1</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line">    <span class="cmt">// 4. Πληρωμή μετρητοίς — κλείνει & εκτυπώνει</span></span>
+<span class="line">    <span class="kw">final</span> <span class="var">pay</span> <span class="punc">=</span> <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executePayment</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span> <span class="num">10.00</span><span class="punc">,</span> <span class="str">'ΜΕΤΡΗΤΑ'</span><span class="punc">,</span> <span class="str">''</span><span class="punc">);</span></span>
+<span class="line">    <span class="kw">final</span> <span class="var">change</span> <span class="punc">=</span> <span class="var">pay</span><span class="punc">.</span><span class="var">fields</span><span class="punc">.</span><span class="var">isNotEmpty</span> <span class="punc">?</span> <span class="var">pay</span><span class="punc">.</span><span class="var">fields</span><span class="punc">[</span><span class="num">0</span><span class="punc">] :</span> <span class="str">'0.00'</span><span class="punc">;</span></span>
+<span class="line">    <span class="fn">print</span><span class="punc">(</span><span class="str">'Ρέστα: €</span><span class="punc">$change</span><span class="str">'</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line">  <span class="punc">}</span> <span class="kw">on</span> <span class="cls">MatEcrErrorException</span> <span class="kw">catch</span> <span class="punc">(</span><span class="var">e</span><span class="punc">) {</span></span>
+<span class="line">    <span class="cmt">// Ακύρωση αν κάτι πήγε στραβά στη μέση</span></span>
+<span class="line">    <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">cancelReceipt</span><span class="punc">();</span></span>
+<span class="line">    <span class="fn">rethrow</span><span class="punc">;</span></span>
+<span class="line">  <span class="punc">}</span></span>
+<span class="line"><span class="punc">}</span></span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">8</div>
+  </div>
+</div>
+
+<!-- ╔════════════════════════════════════════╗
+     ║   PAGE 9 — Examples Part 2            ║
+     ╚════════════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Παραδείγματα — Z-Report & Status</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+
+    <!-- EXAMPLE 3: Z-Report -->
+    <div class="scenario">
+      <div class="scenario-header">
+        <div class="scenario-num">3</div>
+        <div>
+          <div class="scenario-title">Ημερήσιο Κλείσιμο — Z-Report</div>
+          <div class="scenario-subtitle">Έκδοση αναφοράς ημερήσιου κλεισίματος με επαλήθευση κατάστασης</div>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="info-box orange" style="margin-bottom:10px;">
+          <div class="ib-icon">⚠️</div>
+          <div class="ib-text">
+            <strong>Προϋπόθεση:</strong> Πριν το Z-report, βεβαιωθείτε ότι <strong>δεν υπάρχει ανοιχτή απόδειξη</strong> (<code class="ci">fiscalStatus.transactionOpen == false</code>) και ότι η <strong>ημέρα είναι ανοιχτή</strong> (<code class="ci">fiscalStatus.dayIsOpen == true</code>).
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="cb-label">Dart</div>
+<span class="line"><span class="cmt">/// Ημερήσιο κλείσιμο με έλεγχο κατάστασης πριν</span></span>
+<span class="line"><span class="kw">Future</span><span class="punc">&lt;</span><span class="kw">void</span><span class="punc">&gt;</span> <span class="fn">doZReport</span><span class="punc">(</span><span class="cls">MatProtocol</span> <span class="var">mat</span><span class="punc">) async {</span></span>
+<span class="line">  <span class="cmt">// 1. Έλεγχος κατάστασης πριν το Z</span></span>
+<span class="line">  <span class="kw">final</span> <span class="cls">MatStatus</span> <span class="var">status</span> <span class="punc">=</span> <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">getStatus</span><span class="punc">();</span></span>
+<span class="line"></span>
+<span class="line">  <span class="kw">if</span> <span class="punc">(</span><span class="var">status</span><span class="punc">.</span><span class="var">fiscalStatus</span><span class="punc">.</span><span class="var">transactionOpen</span><span class="punc">) {</span></span>
+<span class="line">    <span class="kw">throw</span> <span class="cls">StateError</span><span class="punc">(</span><span class="str">'Υπάρχει ανοιχτή απόδειξη! Κλείσε την πρώτα.'</span><span class="punc">);</span></span>
+<span class="line">  <span class="punc">}</span></span>
+<span class="line">  <span class="kw">if</span> <span class="punc">(!</span><span class="var">status</span><span class="punc">.</span><span class="var">fiscalStatus</span><span class="punc">.</span><span class="var">dayIsOpen</span><span class="punc">) {</span></span>
+<span class="line">    <span class="kw">throw</span> <span class="cls">StateError</span><span class="punc">(</span><span class="str">'Η ημέρα είναι ήδη κλειστή (Z ήδη εκδόθηκε).'</span><span class="punc">);</span></span>
+<span class="line">  <span class="punc">}</span></span>
+<span class="line"></span>
+<span class="line">  <span class="cmt">// 2. Προαιρετικά: X-report πρώτα (διαβάζει σύνολα χωρίς μηδενισμό)</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeIssueReport</span><span class="punc">(</span><span class="num">1</span><span class="punc">);</span>  <span class="cmt">// type=1 → X-report</span></span>
+<span class="line"></span>
+<span class="line">  <span class="cmt">// 3. Z-report (ημερήσιο κλείσιμο — αυξάνει Z-counter)</span></span>
+<span class="line">  <span class="cmt">// Δώσε μεγαλύτερο timeout — η εκτύπωση παίρνει χρόνο</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">sendRawCommand</span><span class="punc">(</span></span>
+<span class="line">    <span class="cls">MatPacket</span><span class="punc">(</span>requestCode<span class="punc">:</span> <span class="str">'x'</span><span class="punc">,</span> fields<span class="punc">: [</span><span class="str">'7'</span><span class="punc">]),</span>  <span class="cmt">// type=7 → Z-report</span></span>
+<span class="line">    replyTimeout<span class="punc">:</span> <span class="kw">const</span> <span class="cls">Duration</span><span class="punc">(</span>seconds<span class="punc">:</span> <span class="num">60</span><span class="punc">),</span></span>
+<span class="line">  <span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line">  <span class="fn">print</span><span class="punc">(</span><span class="str">'✅ Z-Report εκδόθηκε επιτυχώς!'</span><span class="punc">);</span></span>
+<span class="line"><span class="punc">}</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXAMPLE 4: Full Day Flow -->
+    <div class="scenario">
+      <div class="scenario-header">
+        <div class="scenario-num">4</div>
+        <div>
+          <div class="scenario-title">Πλήρης Ροή Εργασίας Ημέρας</div>
+          <div class="scenario-subtitle">Από αρχή ημέρας έως ημερήσιο κλείσιμο</div>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="code-block">
+          <div class="cb-label">Dart</div>
+<span class="line"><span class="kw">final</span> <span class="var">mat</span> <span class="punc">=</span> <span class="cls">MatProtocol</span><span class="punc">(</span>host<span class="punc">:</span> <span class="str">'192.168.1.50'</span><span class="punc">,</span> port<span class="punc">:</span> <span class="num">9100</span><span class="punc">);</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">try</span> <span class="punc">{</span></span>
+<span class="line">  <span class="cmt">// ── ΕΝΑΡΞΗ ΗΜΕΡΑΣ ──────────────────────────────</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">connect</span><span class="punc">();</span></span>
+<span class="line">  <span class="kw">final</span> <span class="var">s</span> <span class="punc">=</span> <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">getStatus</span><span class="punc">();</span></span>
+<span class="line">  <span class="fn">print</span><span class="punc">(</span><span class="str">'Ημέρα ανοιχτή: </span><span class="punc">${</span><span class="var">s</span><span class="punc">.</span><span class="var">fiscalStatus</span><span class="punc">.</span><span class="var">dayIsOpen</span><span class="punc">}</span><span class="str">'</span><span class="punc">);</span></span>
+<span class="line">  <span class="cmt">// Δεν χρειάζεται να "ανοίξεις" ημέρα — ανοίγει αυτόματα με την πρώτη απόδειξη!</span></span>
+<span class="line"></span>
+<span class="line">  <span class="cmt">// ── ΕΙΣΑΓΩΓΗ ΜΕΤΡΗΤΩΝ (Cash-In) ────────────────</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">openCashInOut</span><span class="punc">(</span><span class="num">1</span><span class="punc">,</span> <span class="num">0</span><span class="punc">);</span>  <span class="cmt">// type=1 cash-in</span></span>
+<span class="line">  <span class="cmt">// ... πληκτρολόγηση ποσού στην ταμειακή ...</span></span>
+<span class="line"></span>
+<span class="line">  <span class="cmt">// ── ΠΩΛΗΣΗ #1 (Αρχικό δώρο) ────────────────────</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">setActiveClerkCommand</span><span class="punc">(</span><span class="num">1</span><span class="punc">);</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">itemSale</span><span class="punc">(</span><span class="num">5.00</span><span class="punc">,</span> description<span class="punc">:</span> <span class="str">'ΓΛΥΚΟ ΗΜΕΡΑΣ'</span><span class="punc">,</span> department<span class="punc">:</span> <span class="num">3</span><span class="punc">);</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">sendPayment</span><span class="punc">(</span><span class="num">5.00</span><span class="punc">);</span>  <span class="cmt">// Μετρητά by default</span></span>
+<span class="line"></span>
+<span class="line">  <span class="cmt">// ── ΤΕΛΟΣ ΗΜΕΡΑΣ: X-report, μετά Z ─────────────</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">executeIssueReport</span><span class="punc">(</span><span class="num">1</span><span class="punc">);</span>  <span class="cmt">// X-report</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">sendRawCommand</span><span class="punc">(</span><span class="cls">MatPacket</span><span class="punc">(</span>requestCode<span class="punc">:</span> <span class="str">'x'</span><span class="punc">,</span> fields<span class="punc">: [</span><span class="str">'7'</span><span class="punc">]),</span></span>
+<span class="line">    replyTimeout<span class="punc">:</span> <span class="kw">const</span> <span class="cls">Duration</span><span class="punc">(</span>seconds<span class="punc">:</span> <span class="num">60</span><span class="punc">));</span>  <span class="cmt">// Z-report</span></span>
+<span class="line"></span>
+<span class="line"><span class="punc">}</span> <span class="kw">on</span> <span class="cls">MatException</span> <span class="kw">catch</span> <span class="punc">(</span><span class="var">e</span><span class="punc">) {</span></span>
+<span class="line">  <span class="fn">print</span><span class="punc">(</span><span class="str">'❌ Σφάλμα: </span><span class="punc">$e</span><span class="str">'</span><span class="punc">);</span></span>
+<span class="line"><span class="punc">}</span> <span class="kw">finally</span> <span class="punc">{</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">disconnect</span><span class="punc">();</span></span>
+<span class="line">  <span class="kw">await</span> <span class="var">mat</span><span class="punc">.</span><span class="fn">dispose</span><span class="punc">();</span>  <span class="cmt">// ΠΑΝΤΑ σε finally!</span></span>
+<span class="line"><span class="punc">}</span></span>
+        </div>
+
+        <div class="info-box green" style="margin-bottom:0;">
+          <div class="ib-icon">💡</div>
+          <div class="ib-text">
+            <strong>Best Practice:</strong> Βάλε πάντα <code class="ci green">disconnect()</code> και <code class="ci green">dispose()</code> μέσα σε <code class="ci green">finally</code> block ώστε οι πόροι να αποδεσμεύονται ακόμα και σε περίπτωση exception.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">9</div>
+  </div>
+</div>
+
+<!-- ╔═══════════════════════════════════╗
+     ║   PAGE 10 — Error Codes Reference ║
+     ╚═══════════════════════════════════╝ -->
+<div class="page">
+  <div class="page-header">
+    <div class="ph-left"><span>MatCashMachine</span><span class="ph-sep">›</span><span class="ph-current">Κωδικοί Σφαλμάτων & Αναφορά</span></div>
+    <div class="ph-logo">MatCashMachine SDK</div>
+  </div>
+  <div class="page-content">
+    <div class="sec-title">Κωδικοί Σφαλμάτων & Γρήγορη Αναφορά</div>
+    <div class="sec-sub">Πλήρης λίστα ECR error codes και συνοπτική αναφορά protocol flow</div>
+
+    <div class="two-col" style="margin-bottom:16px;">
+      <div>
+        <p style="font-size:9pt; font-weight:700; color:var(--primary-dark); margin-bottom:10px;">ECR Error Codes (MatEcrErrorException.errorCode)</p>
+        <table class="cmd-table" style="margin-bottom:0;">
+          <thead><tr><th style="width:22%">Κωδικός</th><th>Σφάλμα</th><th style="width:30%">Λύση</th></tr></thead>
+          <tbody>
+            <tr><td class="method" style="color:var(--red);">'00'</td><td class="desc" style="color:var(--green);">✅ Επιτυχία</td><td class="returns">—</td></tr>
+            <tr><td class="method" style="color:var(--red);">'01'</td><td class="desc">Άγνωστη εντολή</td><td class="returns">Έλεγξε requestCode</td></tr>
+            <tr><td class="method" style="color:var(--red);">'02'</td><td class="desc">Μη επιτρεπτή κατάσταση</td><td class="returns">Έλεγξε getStatus()</td></tr>
+            <tr><td class="method" style="color:var(--red);">'03'</td><td class="desc">Ελλιπή δεδομένα</td><td class="returns">Πρόσθεσε παραμέτρους</td></tr>
+            <tr><td class="method" style="color:var(--red);">'04'</td><td class="desc">Απαιτεί ανοιχτή ημέρα</td><td class="returns">Κάνε πρώτα Z-report</td></tr>
+            <tr><td class="method" style="color:var(--red);">'05'</td><td class="desc">Απαιτεί κλειστή ημέρα</td><td class="returns">Κάνε Z-report</td></tr>
+            <tr><td class="method" style="color:var(--red);">'06'</td><td class="desc">Απαιτεί ανοιχτή απόδειξη</td><td class="returns">Κάνε πρώτα itemSale</td></tr>
+            <tr><td class="method" style="color:var(--red);">'07'</td><td class="desc">Απαιτεί κλειστή απόδειξη</td><td class="returns">Κλείσε πρώτα την απόδ.</td></tr>
+            <tr><td class="method" style="color:var(--red);">'08'</td><td class="desc">Γεμάτη μνήμη</td><td class="returns">Επικοινωνία με service</td></tr>
+            <tr><td class="method" style="color:var(--red);">'11'</td><td class="desc">Άκυρο τμήμα (DPT)</td><td class="returns">Ελέγξε department</td></tr>
+            <tr><td class="method" style="color:var(--red);">'12'</td><td class="desc">Άκυρη πληρωμή</td><td class="returns">Ελέγξε paymentCode</td></tr>
+            <tr><td class="method" style="color:var(--red);">'17'</td><td class="desc">Σφάλμα εκτυπωτή</td><td class="returns">Έλεγχος χαρτιού/hardware</td></tr>
+            <tr><td class="method" style="color:var(--red);">'19'</td><td class="desc">Ήδη σε φάση πληρωμής</td><td class="returns">Κάλεσε executePayment</td></tr>
+            <tr><td class="method" style="color:var(--red);">'20'</td><td class="desc">Υπερβαίνει σύνολο</td><td class="returns">Μείωσε το ποσό</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <p style="font-size:9pt; font-weight:700; color:var(--primary-dark); margin-bottom:10px;">Protocol Flow — State Machine</p>
+        <div style="background:var(--code-bg); border-radius:10px; padding:16px 18px; font-family:'JetBrains Mono',monospace; font-size:8pt; line-height:2.0;">
+          <div style="color:#cba6f7;">CLIENT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ECR</div>
+          <div style="color:#6c7086;">────────────────────────</div>
+          <div style="color:#89b4fa;">  ENQ  ──────────────────►</div>
+          <div style="color:#a6e3a1;">  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;◄──────────────── ACK</div>
+          <div style="color:#89b4fa;">  STX…payload…CS…ETX ───►</div>
+          <div style="color:#a6e3a1;">  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;◄──────────────── ACK</div>
+          <div style="color:#a6e3a1;">  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;◄──STX…reply…ETX ──</div>
+          <div style="color:#89b4fa;">  ACK  ──────────────────►</div>
+          <div style="color:#6c7086;">────────────────────────</div>
+          <div style="color:#f9e2af; margin-top:8px;">Checksum: sum(bytes) % 100</div>
+          <div style="color:#f9e2af;">Separator: '/' (0x2F)</div>
+          <div style="color:#f9e2af;">Encoding: Windows-1253</div>
+          <div style="color:#6c7086; margin-top:8px;"># NAK → retry (max 3)</div>
+          <div style="color:#6c7086;"># Timeout 10s (default)</div>
+          <div style="color:#6c7086;"># Z-report: 60s timeout</div>
+        </div>
+
+        <p style="font-size:9pt; font-weight:700; color:var(--primary-dark); margin: 14px 0 10px;">Import Statement</p>
+        <div class="code-block" style="margin:0; padding:12px 16px;">
+          <span class="line"><span class="kw">import</span> <span class="str">'package:matcashmachine/matcashmachine.dart'</span><span class="punc">;</span></span>
+          <span class="line"></span>
+          <span class="line"><span class="cmt">// Εξάγει αυτόματα:</span></span>
+          <span class="line"><span class="cmt">// MatProtocol, MatCharset, MatPacket</span></span>
+          <span class="line"><span class="cmt">// MatReplyPacket, MatStatus</span></span>
+          <span class="line"><span class="cmt">// MatException + 4 υποκλάσεις</span></span>
+          <span class="line"><span class="cmt">// encodeString(), decodeBytes()</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box purple">
+      <div class="ib-icon">📋</div>
+      <div class="ib-text">
+        <strong>Checklist Πριν από Παραγωγή</strong>
+        ✅ Χρησιμοποιείς <code class="ci">await mat.dispose()</code> (όχι <code class="ci">mat.dispose()</code>) σε finally block &nbsp;
+        ✅ Έχεις ορίσει <code class="ci">replyTimeout: Duration(seconds: 60)</code> για Z-report &nbsp;
+        ✅ Οι περιγραφές ειδών είναι σε Windows-1253 (Ελληνικά OK, emoji ❌) &nbsp;
+        ✅ Ελέγχεις <code class="ci">fiscalStatus.transactionOpen</code> πριν Z-report &nbsp;
+        ✅ Χειρίζεσαι όλα τα subtypes του <code class="ci">MatException</code>
+      </div>
+    </div>
+  </div>
+  <div class="page-footer">
+    <div class="footer-logo">MatCashMachine SDK</div>
+    <div>Τεχνικό Εγχειρίδιο · MCP v1.1.12</div>
+    <div class="footer-pg">10</div>
+  </div>
+</div>
+
+</body>
+</html>
