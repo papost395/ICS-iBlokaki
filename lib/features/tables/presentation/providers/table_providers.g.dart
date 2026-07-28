@@ -6,7 +6,7 @@ part of 'table_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tableRepositoryHash() => r'4505fa5863dcb1cf04686c1e4a425e5a2ac5822e';
+String _$tableRepositoryHash() => r'1a2ebba25203d40ce214b6c92deb432366433cd8';
 
 /// See also [tableRepository].
 @ProviderFor(tableRepository)
@@ -40,7 +40,7 @@ final tablesStreamProvider = StreamProvider<List<RestaurantTable>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef TablesStreamRef = StreamProviderRef<List<RestaurantTable>>;
-String _$tableActionsHash() => r'aa77a824606571037b840a511231f0c698d3250f';
+String _$tableActionsHash() => r'0c9c15f18bcefc542424fa0105d966e56e8cdbdc';
 
 /// See also [TableActions].
 @ProviderFor(TableActions)

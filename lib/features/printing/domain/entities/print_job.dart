@@ -13,6 +13,8 @@ abstract class PrintJob with _$PrintJob {
     required String waiterName,
     String? header,
     String? footer,
+    String? logoPath,
+    String? stationName,
     DateTime? timestamp,
   }) = _PrintJob;
 }

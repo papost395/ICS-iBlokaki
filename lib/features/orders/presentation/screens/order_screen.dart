@@ -140,7 +140,7 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
                     // Right Pane: Products Menu
                     Expanded(
                       flex: 6,
-                      child: _buildMenuPane(categories, filteredProducts, activeOrder, isDark),
+                      child: _buildMenuPane(categories, allProducts, activeOrder, isDark),
                     ),
                   ],
                 )
@@ -317,8 +317,8 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
                     tooltip: 'Διορθωτική Εκτύπωση',
                   ),
                 ],
-                // ➕ Προσθήκη (mobile only)
-                if (isMobile && categories != null && allProducts != null) ...[
+                // ➕ Προσθήκη
+                if (categories != null && allProducts != null) ...[
                   const SizedBox(width: 8),
                   FilledButton(
                     onPressed: () {
@@ -422,9 +422,9 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
             icon: const Icon(Icons.close, color: AppColors.error, size: 20),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(),
-            onPressed: () {
-              ref.read(orderRepositoryProvider).removeItem(item.id);
-              // Εμφάνισε το πορτοκαλί εκτυπωτακάκι διορθωτικής
+            onPressed: () async {
+              await ref.read(orderRepositoryProvider).removeItem(item.id);
+              ref.invalidate(activeOrdersStreamProvider);
               setState(() => _hasDeletedItems = true);
             },
           ),
@@ -865,6 +865,8 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
           waiterName: waiterName,
           header: '*** ΔΙΟΡΘΩΤΙΚΗ ***\n*** ΑΚΥΡΩΣΗ ΕΙΔΟΥΣ ***\n${shopConfig?.receiptHeader ?? ""}',
           footer: shopConfig?.receiptFooter,
+          logoPath: shopConfig?.logoPath,
+          stationName: shopConfig?.stationName,
           timestamp: DateTime.now(),
         ));
       }
@@ -923,6 +925,8 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
           waiterName: waiterName,
           header: shopConfig?.receiptHeader,
           footer: shopConfig?.receiptFooter,
+          logoPath: shopConfig?.logoPath,
+          stationName: shopConfig?.stationName,
           timestamp: DateTime.now(),
         ));
       }
@@ -1000,6 +1004,8 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
           waiterName: waiterName,
           header: shopConfig?.receiptHeader,
           footer: shopConfig?.receiptFooter,
+          logoPath: shopConfig?.logoPath,
+          stationName: shopConfig?.stationName,
           timestamp: DateTime.now(),
         ));
       }
@@ -1057,6 +1063,8 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
       waiterName: waiterName,
       header: shopConfig?.receiptHeader,
       footer: shopConfig?.receiptFooter,
+      logoPath: shopConfig?.logoPath,
+      stationName: shopConfig?.stationName,
       timestamp: DateTime.now(),
     )).toList();
 

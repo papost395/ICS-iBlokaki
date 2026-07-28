@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$PrintJob {
 
- PrinterDevice get printer; List<OrderItem> get items; String get tableName; String get waiterName; String? get header; String? get footer; DateTime? get timestamp;
+ PrinterDevice get printer; List<OrderItem> get items; String get tableName; String get waiterName; String? get header; String? get footer; String? get logoPath; String? get stationName; DateTime? get timestamp;
 /// Create a copy of PrintJob
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $PrintJobCopyWith<PrintJob> get copyWith => _$PrintJobCopyWithImpl<PrintJob>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PrintJob&&(identical(other.printer, printer) || other.printer == printer)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.tableName, tableName) || other.tableName == tableName)&&(identical(other.waiterName, waiterName) || other.waiterName == waiterName)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PrintJob&&(identical(other.printer, printer) || other.printer == printer)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.tableName, tableName) || other.tableName == tableName)&&(identical(other.waiterName, waiterName) || other.waiterName == waiterName)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&(identical(other.logoPath, logoPath) || other.logoPath == logoPath)&&(identical(other.stationName, stationName) || other.stationName == stationName)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,printer,const DeepCollectionEquality().hash(items),tableName,waiterName,header,footer,timestamp);
+int get hashCode => Object.hash(runtimeType,printer,const DeepCollectionEquality().hash(items),tableName,waiterName,header,footer,logoPath,stationName,timestamp);
 
 @override
 String toString() {
-  return 'PrintJob(printer: $printer, items: $items, tableName: $tableName, waiterName: $waiterName, header: $header, footer: $footer, timestamp: $timestamp)';
+  return 'PrintJob(printer: $printer, items: $items, tableName: $tableName, waiterName: $waiterName, header: $header, footer: $footer, logoPath: $logoPath, stationName: $stationName, timestamp: $timestamp)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $PrintJobCopyWith<$Res>  {
   factory $PrintJobCopyWith(PrintJob value, $Res Function(PrintJob) _then) = _$PrintJobCopyWithImpl;
 @useResult
 $Res call({
- PrinterDevice printer, List<OrderItem> items, String tableName, String waiterName, String? header, String? footer, DateTime? timestamp
+ PrinterDevice printer, List<OrderItem> items, String tableName, String waiterName, String? header, String? footer, String? logoPath, String? stationName, DateTime? timestamp
 });
 
 
@@ -62,7 +62,7 @@ class _$PrintJobCopyWithImpl<$Res>
 
 /// Create a copy of PrintJob
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? printer = null,Object? items = null,Object? tableName = null,Object? waiterName = null,Object? header = freezed,Object? footer = freezed,Object? timestamp = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? printer = null,Object? items = null,Object? tableName = null,Object? waiterName = null,Object? header = freezed,Object? footer = freezed,Object? logoPath = freezed,Object? stationName = freezed,Object? timestamp = freezed,}) {
   return _then(_self.copyWith(
 printer: null == printer ? _self.printer : printer // ignore: cast_nullable_to_non_nullable
 as PrinterDevice,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
@@ -70,6 +70,8 @@ as List<OrderItem>,tableName: null == tableName ? _self.tableName : tableName //
 as String,waiterName: null == waiterName ? _self.waiterName : waiterName // ignore: cast_nullable_to_non_nullable
 as String,header: freezed == header ? _self.header : header // ignore: cast_nullable_to_non_nullable
 as String?,footer: freezed == footer ? _self.footer : footer // ignore: cast_nullable_to_non_nullable
+as String?,logoPath: freezed == logoPath ? _self.logoPath : logoPath // ignore: cast_nullable_to_non_nullable
+as String?,stationName: freezed == stationName ? _self.stationName : stationName // ignore: cast_nullable_to_non_nullable
 as String?,timestamp: freezed == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
@@ -165,10 +167,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PrinterDevice printer,  List<OrderItem> items,  String tableName,  String waiterName,  String? header,  String? footer,  DateTime? timestamp)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( PrinterDevice printer,  List<OrderItem> items,  String tableName,  String waiterName,  String? header,  String? footer,  String? logoPath,  String? stationName,  DateTime? timestamp)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PrintJob() when $default != null:
-return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that.header,_that.footer,_that.timestamp);case _:
+return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that.header,_that.footer,_that.logoPath,_that.stationName,_that.timestamp);case _:
   return orElse();
 
 }
@@ -186,10 +188,10 @@ return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PrinterDevice printer,  List<OrderItem> items,  String tableName,  String waiterName,  String? header,  String? footer,  DateTime? timestamp)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( PrinterDevice printer,  List<OrderItem> items,  String tableName,  String waiterName,  String? header,  String? footer,  String? logoPath,  String? stationName,  DateTime? timestamp)  $default,) {final _that = this;
 switch (_that) {
 case _PrintJob():
-return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that.header,_that.footer,_that.timestamp);case _:
+return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that.header,_that.footer,_that.logoPath,_that.stationName,_that.timestamp);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -206,10 +208,10 @@ return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PrinterDevice printer,  List<OrderItem> items,  String tableName,  String waiterName,  String? header,  String? footer,  DateTime? timestamp)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( PrinterDevice printer,  List<OrderItem> items,  String tableName,  String waiterName,  String? header,  String? footer,  String? logoPath,  String? stationName,  DateTime? timestamp)?  $default,) {final _that = this;
 switch (_that) {
 case _PrintJob() when $default != null:
-return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that.header,_that.footer,_that.timestamp);case _:
+return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that.header,_that.footer,_that.logoPath,_that.stationName,_that.timestamp);case _:
   return null;
 
 }
@@ -221,7 +223,7 @@ return $default(_that.printer,_that.items,_that.tableName,_that.waiterName,_that
 
 
 class _PrintJob implements PrintJob {
-  const _PrintJob({required this.printer, required final  List<OrderItem> items, required this.tableName, required this.waiterName, this.header, this.footer, this.timestamp}): _items = items;
+  const _PrintJob({required this.printer, required final  List<OrderItem> items, required this.tableName, required this.waiterName, this.header, this.footer, this.logoPath, this.stationName, this.timestamp}): _items = items;
   
 
 @override final  PrinterDevice printer;
@@ -236,6 +238,8 @@ class _PrintJob implements PrintJob {
 @override final  String waiterName;
 @override final  String? header;
 @override final  String? footer;
+@override final  String? logoPath;
+@override final  String? stationName;
 @override final  DateTime? timestamp;
 
 /// Create a copy of PrintJob
@@ -248,16 +252,16 @@ _$PrintJobCopyWith<_PrintJob> get copyWith => __$PrintJobCopyWithImpl<_PrintJob>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PrintJob&&(identical(other.printer, printer) || other.printer == printer)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.tableName, tableName) || other.tableName == tableName)&&(identical(other.waiterName, waiterName) || other.waiterName == waiterName)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _PrintJob&&(identical(other.printer, printer) || other.printer == printer)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.tableName, tableName) || other.tableName == tableName)&&(identical(other.waiterName, waiterName) || other.waiterName == waiterName)&&(identical(other.header, header) || other.header == header)&&(identical(other.footer, footer) || other.footer == footer)&&(identical(other.logoPath, logoPath) || other.logoPath == logoPath)&&(identical(other.stationName, stationName) || other.stationName == stationName)&&(identical(other.timestamp, timestamp) || other.timestamp == timestamp));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,printer,const DeepCollectionEquality().hash(_items),tableName,waiterName,header,footer,timestamp);
+int get hashCode => Object.hash(runtimeType,printer,const DeepCollectionEquality().hash(_items),tableName,waiterName,header,footer,logoPath,stationName,timestamp);
 
 @override
 String toString() {
-  return 'PrintJob(printer: $printer, items: $items, tableName: $tableName, waiterName: $waiterName, header: $header, footer: $footer, timestamp: $timestamp)';
+  return 'PrintJob(printer: $printer, items: $items, tableName: $tableName, waiterName: $waiterName, header: $header, footer: $footer, logoPath: $logoPath, stationName: $stationName, timestamp: $timestamp)';
 }
 
 
@@ -268,7 +272,7 @@ abstract mixin class _$PrintJobCopyWith<$Res> implements $PrintJobCopyWith<$Res>
   factory _$PrintJobCopyWith(_PrintJob value, $Res Function(_PrintJob) _then) = __$PrintJobCopyWithImpl;
 @override @useResult
 $Res call({
- PrinterDevice printer, List<OrderItem> items, String tableName, String waiterName, String? header, String? footer, DateTime? timestamp
+ PrinterDevice printer, List<OrderItem> items, String tableName, String waiterName, String? header, String? footer, String? logoPath, String? stationName, DateTime? timestamp
 });
 
 
@@ -285,7 +289,7 @@ class __$PrintJobCopyWithImpl<$Res>
 
 /// Create a copy of PrintJob
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? printer = null,Object? items = null,Object? tableName = null,Object? waiterName = null,Object? header = freezed,Object? footer = freezed,Object? timestamp = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? printer = null,Object? items = null,Object? tableName = null,Object? waiterName = null,Object? header = freezed,Object? footer = freezed,Object? logoPath = freezed,Object? stationName = freezed,Object? timestamp = freezed,}) {
   return _then(_PrintJob(
 printer: null == printer ? _self.printer : printer // ignore: cast_nullable_to_non_nullable
 as PrinterDevice,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
@@ -293,6 +297,8 @@ as List<OrderItem>,tableName: null == tableName ? _self.tableName : tableName //
 as String,waiterName: null == waiterName ? _self.waiterName : waiterName // ignore: cast_nullable_to_non_nullable
 as String,header: freezed == header ? _self.header : header // ignore: cast_nullable_to_non_nullable
 as String?,footer: freezed == footer ? _self.footer : footer // ignore: cast_nullable_to_non_nullable
+as String?,logoPath: freezed == logoPath ? _self.logoPath : logoPath // ignore: cast_nullable_to_non_nullable
+as String?,stationName: freezed == stationName ? _self.stationName : stationName // ignore: cast_nullable_to_non_nullable
 as String?,timestamp: freezed == timestamp ? _self.timestamp : timestamp // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));

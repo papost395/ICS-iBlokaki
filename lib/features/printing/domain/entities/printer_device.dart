@@ -33,6 +33,8 @@ abstract class PrinterDevice with _$PrinterDevice {
     @Default(false) bool isUtf8,
     @Default(false) bool isCp737,
     @Default(80) int paperSize,
+    @Default(false) bool isDoubleSize,
+    @Default(false) bool isExtraBold,
   }) = _PrinterDevice;
 
   factory PrinterDevice.fromJson(Map<String, dynamic> json) =>

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ShopConfig {
 
- String get id; String get shopId; bool get isSplitPrintingEnabled; String get receiptHeader; String get receiptFooter;
+ String get id; String get shopId; bool get isSplitPrintingEnabled; String get receiptHeader; String get receiptFooter; String? get logoPath; String? get stationName;
 /// Create a copy of ShopConfig
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $ShopConfigCopyWith<ShopConfig> get copyWith => _$ShopConfigCopyWithImpl<ShopCon
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShopConfig&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.isSplitPrintingEnabled, isSplitPrintingEnabled) || other.isSplitPrintingEnabled == isSplitPrintingEnabled)&&(identical(other.receiptHeader, receiptHeader) || other.receiptHeader == receiptHeader)&&(identical(other.receiptFooter, receiptFooter) || other.receiptFooter == receiptFooter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ShopConfig&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.isSplitPrintingEnabled, isSplitPrintingEnabled) || other.isSplitPrintingEnabled == isSplitPrintingEnabled)&&(identical(other.receiptHeader, receiptHeader) || other.receiptHeader == receiptHeader)&&(identical(other.receiptFooter, receiptFooter) || other.receiptFooter == receiptFooter)&&(identical(other.logoPath, logoPath) || other.logoPath == logoPath)&&(identical(other.stationName, stationName) || other.stationName == stationName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,shopId,isSplitPrintingEnabled,receiptHeader,receiptFooter);
+int get hashCode => Object.hash(runtimeType,id,shopId,isSplitPrintingEnabled,receiptHeader,receiptFooter,logoPath,stationName);
 
 @override
 String toString() {
-  return 'ShopConfig(id: $id, shopId: $shopId, isSplitPrintingEnabled: $isSplitPrintingEnabled, receiptHeader: $receiptHeader, receiptFooter: $receiptFooter)';
+  return 'ShopConfig(id: $id, shopId: $shopId, isSplitPrintingEnabled: $isSplitPrintingEnabled, receiptHeader: $receiptHeader, receiptFooter: $receiptFooter, logoPath: $logoPath, stationName: $stationName)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $ShopConfigCopyWith<$Res>  {
   factory $ShopConfigCopyWith(ShopConfig value, $Res Function(ShopConfig) _then) = _$ShopConfigCopyWithImpl;
 @useResult
 $Res call({
- String id, String shopId, bool isSplitPrintingEnabled, String receiptHeader, String receiptFooter
+ String id, String shopId, bool isSplitPrintingEnabled, String receiptHeader, String receiptFooter, String? logoPath, String? stationName
 });
 
 
@@ -65,14 +65,16 @@ class _$ShopConfigCopyWithImpl<$Res>
 
 /// Create a copy of ShopConfig
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? shopId = null,Object? isSplitPrintingEnabled = null,Object? receiptHeader = null,Object? receiptFooter = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? shopId = null,Object? isSplitPrintingEnabled = null,Object? receiptHeader = null,Object? receiptFooter = null,Object? logoPath = freezed,Object? stationName = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,shopId: null == shopId ? _self.shopId : shopId // ignore: cast_nullable_to_non_nullable
 as String,isSplitPrintingEnabled: null == isSplitPrintingEnabled ? _self.isSplitPrintingEnabled : isSplitPrintingEnabled // ignore: cast_nullable_to_non_nullable
 as bool,receiptHeader: null == receiptHeader ? _self.receiptHeader : receiptHeader // ignore: cast_nullable_to_non_nullable
 as String,receiptFooter: null == receiptFooter ? _self.receiptFooter : receiptFooter // ignore: cast_nullable_to_non_nullable
-as String,
+as String,logoPath: freezed == logoPath ? _self.logoPath : logoPath // ignore: cast_nullable_to_non_nullable
+as String?,stationName: freezed == stationName ? _self.stationName : stationName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -157,10 +159,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String shopId,  bool isSplitPrintingEnabled,  String receiptHeader,  String receiptFooter)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String shopId,  bool isSplitPrintingEnabled,  String receiptHeader,  String receiptFooter,  String? logoPath,  String? stationName)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ShopConfig() when $default != null:
-return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receiptHeader,_that.receiptFooter);case _:
+return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receiptHeader,_that.receiptFooter,_that.logoPath,_that.stationName);case _:
   return orElse();
 
 }
@@ -178,10 +180,10 @@ return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receipt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String shopId,  bool isSplitPrintingEnabled,  String receiptHeader,  String receiptFooter)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String shopId,  bool isSplitPrintingEnabled,  String receiptHeader,  String receiptFooter,  String? logoPath,  String? stationName)  $default,) {final _that = this;
 switch (_that) {
 case _ShopConfig():
-return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receiptHeader,_that.receiptFooter);case _:
+return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receiptHeader,_that.receiptFooter,_that.logoPath,_that.stationName);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -198,10 +200,10 @@ return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receipt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String shopId,  bool isSplitPrintingEnabled,  String receiptHeader,  String receiptFooter)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String shopId,  bool isSplitPrintingEnabled,  String receiptHeader,  String receiptFooter,  String? logoPath,  String? stationName)?  $default,) {final _that = this;
 switch (_that) {
 case _ShopConfig() when $default != null:
-return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receiptHeader,_that.receiptFooter);case _:
+return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receiptHeader,_that.receiptFooter,_that.logoPath,_that.stationName);case _:
   return null;
 
 }
@@ -213,7 +215,7 @@ return $default(_that.id,_that.shopId,_that.isSplitPrintingEnabled,_that.receipt
 @JsonSerializable()
 
 class _ShopConfig implements ShopConfig {
-  const _ShopConfig({required this.id, required this.shopId, this.isSplitPrintingEnabled = false, this.receiptHeader = '', this.receiptFooter = ''});
+  const _ShopConfig({required this.id, required this.shopId, this.isSplitPrintingEnabled = false, this.receiptHeader = '', this.receiptFooter = '', this.logoPath, this.stationName});
   factory _ShopConfig.fromJson(Map<String, dynamic> json) => _$ShopConfigFromJson(json);
 
 @override final  String id;
@@ -221,6 +223,8 @@ class _ShopConfig implements ShopConfig {
 @override@JsonKey() final  bool isSplitPrintingEnabled;
 @override@JsonKey() final  String receiptHeader;
 @override@JsonKey() final  String receiptFooter;
+@override final  String? logoPath;
+@override final  String? stationName;
 
 /// Create a copy of ShopConfig
 /// with the given fields replaced by the non-null parameter values.
@@ -235,16 +239,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ShopConfig&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.isSplitPrintingEnabled, isSplitPrintingEnabled) || other.isSplitPrintingEnabled == isSplitPrintingEnabled)&&(identical(other.receiptHeader, receiptHeader) || other.receiptHeader == receiptHeader)&&(identical(other.receiptFooter, receiptFooter) || other.receiptFooter == receiptFooter));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ShopConfig&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.isSplitPrintingEnabled, isSplitPrintingEnabled) || other.isSplitPrintingEnabled == isSplitPrintingEnabled)&&(identical(other.receiptHeader, receiptHeader) || other.receiptHeader == receiptHeader)&&(identical(other.receiptFooter, receiptFooter) || other.receiptFooter == receiptFooter)&&(identical(other.logoPath, logoPath) || other.logoPath == logoPath)&&(identical(other.stationName, stationName) || other.stationName == stationName));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,shopId,isSplitPrintingEnabled,receiptHeader,receiptFooter);
+int get hashCode => Object.hash(runtimeType,id,shopId,isSplitPrintingEnabled,receiptHeader,receiptFooter,logoPath,stationName);
 
 @override
 String toString() {
-  return 'ShopConfig(id: $id, shopId: $shopId, isSplitPrintingEnabled: $isSplitPrintingEnabled, receiptHeader: $receiptHeader, receiptFooter: $receiptFooter)';
+  return 'ShopConfig(id: $id, shopId: $shopId, isSplitPrintingEnabled: $isSplitPrintingEnabled, receiptHeader: $receiptHeader, receiptFooter: $receiptFooter, logoPath: $logoPath, stationName: $stationName)';
 }
 
 
@@ -255,7 +259,7 @@ abstract mixin class _$ShopConfigCopyWith<$Res> implements $ShopConfigCopyWith<$
   factory _$ShopConfigCopyWith(_ShopConfig value, $Res Function(_ShopConfig) _then) = __$ShopConfigCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String shopId, bool isSplitPrintingEnabled, String receiptHeader, String receiptFooter
+ String id, String shopId, bool isSplitPrintingEnabled, String receiptHeader, String receiptFooter, String? logoPath, String? stationName
 });
 
 
@@ -272,14 +276,16 @@ class __$ShopConfigCopyWithImpl<$Res>
 
 /// Create a copy of ShopConfig
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? shopId = null,Object? isSplitPrintingEnabled = null,Object? receiptHeader = null,Object? receiptFooter = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? shopId = null,Object? isSplitPrintingEnabled = null,Object? receiptHeader = null,Object? receiptFooter = null,Object? logoPath = freezed,Object? stationName = freezed,}) {
   return _then(_ShopConfig(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,shopId: null == shopId ? _self.shopId : shopId // ignore: cast_nullable_to_non_nullable
 as String,isSplitPrintingEnabled: null == isSplitPrintingEnabled ? _self.isSplitPrintingEnabled : isSplitPrintingEnabled // ignore: cast_nullable_to_non_nullable
 as bool,receiptHeader: null == receiptHeader ? _self.receiptHeader : receiptHeader // ignore: cast_nullable_to_non_nullable
 as String,receiptFooter: null == receiptFooter ? _self.receiptFooter : receiptFooter // ignore: cast_nullable_to_non_nullable
-as String,
+as String,logoPath: freezed == logoPath ? _self.logoPath : logoPath // ignore: cast_nullable_to_non_nullable
+as String?,stationName: freezed == stationName ? _self.stationName : stationName // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

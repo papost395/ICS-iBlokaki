@@ -57,7 +57,7 @@ final currentShopIdProvider = AutoDisposeProvider<String?>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef CurrentShopIdRef = AutoDisposeProviderRef<String?>;
-String _$waiterRepositoryHash() => r'5cebac0edf6e5909ff3d4760e9c364834ca71aa1';
+String _$waiterRepositoryHash() => r'1d575f86dd632797d762ffa5344764f5cfffcfe8';
 
 /// See also [waiterRepository].
 @ProviderFor(waiterRepository)

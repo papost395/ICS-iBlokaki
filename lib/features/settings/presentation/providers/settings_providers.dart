@@ -9,6 +9,7 @@ import 'package:order/features/settings/data/datasources/remote_settings_datasou
 import 'package:order/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:order/features/settings/domain/entities/shop_config.dart';
 import 'package:order/features/settings/domain/repositories/settings_repository.dart';
+import 'package:order/core/providers/storage_mode_provider.dart';
 
 part 'settings_providers.g.dart';
 
@@ -16,10 +17,12 @@ part 'settings_providers.g.dart';
 SettingsRepository settingsRepository(Ref ref) {
   final pb = ref.watch(pocketBaseProvider);
   final prefs = ref.watch(sharedPrefsProvider);
+  final isLocalMode = ref.watch(storageModeNotifierProvider);
   return SettingsRepositoryImpl(
     localDataSource: LocalSettingsDataSourceImpl(prefs: prefs),
     remoteDataSource: RemoteSettingsDataSourceImpl(pb: pb),
     pb: pb,
+    isLocalMode: isLocalMode,
   );
 }
 

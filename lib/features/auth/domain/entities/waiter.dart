@@ -10,6 +10,7 @@ abstract class Waiter with _$Waiter {
     required String shopId,
     required String name,
     required String pin,
+    @Default(false) bool isAdmin,
   }) = _Waiter;
 
   factory Waiter.fromJson(Map<String, dynamic> json) => _$WaiterFromJson(json);

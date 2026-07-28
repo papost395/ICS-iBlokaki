@@ -7,6 +7,8 @@ import 'package:order/features/products/presentation/providers/product_providers
 import 'package:order/features/home/presentation/widgets/main_navigation_shell.dart';
 import 'package:order/features/products/presentation/screens/edit_product_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:order/core/database/database_helper.dart';
+import 'package:order/core/providers/storage_mode_provider.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
@@ -97,10 +99,40 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     }
   }
 
+  Future<void> _deleteAllProducts() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Διαγραφή Όλων'),
+        content: const Text('Είστε σίγουροι ότι θέλετε να διαγράψετε ΟΛΑ τα προϊόντα και τις κατηγορίες; Αυτή η ενέργεια δεν αναιρείται.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Ακύρωση')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.pop(ctx, true), 
+            child: const Text('Διαγραφή')
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      setState(() => _isImporting = true);
+      await DatabaseHelper.instance.clearProductsAndCategories();
+      ref.invalidate(categoriesStreamProvider);
+      ref.invalidate(productsStreamProvider);
+      setState(() => _isImporting = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Τα προϊόντα διαγράφηκαν')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final categoriesStream = ref.watch(categoriesStreamProvider);
     final productsStream = ref.watch(productsStreamProvider);
+    final isLocalMode = ref.watch(storageModeNotifierProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -113,6 +145,12 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
           },
         ),
         actions: [
+          if (isLocalMode)
+            IconButton(
+              icon: const Icon(Icons.delete_sweep, color: AppColors.error),
+              tooltip: 'Διαγραφή Όλων',
+              onPressed: _isImporting ? null : _deleteAllProducts,
+            ),
           if (_isImporting)
             const Padding(
               padding: EdgeInsets.all(12.0),

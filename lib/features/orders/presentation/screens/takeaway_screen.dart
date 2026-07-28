@@ -3,12 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:order/core/theme/app_colors.dart';
 import 'package:order/features/products/domain/entities/product.dart';
+import 'package:order/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:order/core/database/database_helper.dart';
 import 'package:order/features/products/domain/entities/category.dart';
 import 'package:order/features/products/presentation/providers/product_providers.dart';
 import 'package:order/features/printing/presentation/providers/printer_providers.dart';
 import 'package:order/features/orders/presentation/providers/takeaway_providers.dart';
 import 'package:order/features/settings/presentation/providers/ecr_config_provider.dart';
 import 'package:matcashmachine/matcashmachine.dart';
+import 'package:order/features/printing/domain/entities/printer_device.dart';
+import 'package:order/features/printing/domain/entities/print_job.dart';
+import 'package:order/features/orders/domain/entities/order_item.dart';
+import 'package:order/features/settings/presentation/providers/settings_providers.dart';
+import 'package:order/features/auth/presentation/providers/auth_providers.dart';
 
 class TakeawayScreen extends ConsumerStatefulWidget {
   const TakeawayScreen({super.key});
@@ -62,11 +69,11 @@ class _TakeawayScreenState extends ConsumerState<TakeawayScreen> {
           : Column(
               children: [
                 Expanded(
-                  flex: 6,
+                  flex: 4,
                   child: _buildMenuPane(categories, filteredProducts, isDark),
                 ),
                 Expanded(
-                  flex: 4,
+                  flex: 6,
                   child: _buildCartPane(cartItems, cartTotal, isDark),
                 ),
               ],
@@ -239,10 +246,10 @@ class _TakeawayScreenState extends ConsumerState<TakeawayScreen> {
           child: GridView.builder(
             padding: const EdgeInsets.all(16),
             gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 180,
-              childAspectRatio: 1.1,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              maxCrossAxisExtent: 140,
+              childAspectRatio: 1.2,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
             ),
             itemCount: filteredProducts.length,
             itemBuilder: (context, index) {
@@ -292,8 +299,18 @@ class _TakeawayScreenState extends ConsumerState<TakeawayScreen> {
       final ecrConfig = ref.read(ecrConfigNotifierProvider);
       
       if (!ecrConfig.enabled) {
-        throw Exception('Η ταμειακή είναι απενεργοποιημένη στις ρυθμίσεις.');
+        // Fallback to thermal printer if ECR is disabled
+        await _printToThermalPrinter(items, total);
+        
+        ref.read(takeawayCartProvider.notifier).clear();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Η παραγγελία εκτυπώθηκε!'), backgroundColor: AppColors.success),
+          );
+        }
+        return;
       }
+      
       if (ecrConfig.ipAddress.isEmpty) {
         throw Exception('Δεν έχει οριστεί IP διεύθυνση ταμειακής.');
       }
@@ -324,6 +341,25 @@ class _TakeawayScreenState extends ConsumerState<TakeawayScreen> {
       await mat.disconnect();
       await mat.dispose();
       
+      // Save sales locally upon successful print
+      try {
+        final shopId = ref.read(currentShopIdProvider) ?? 'local';
+        final nowMs = DateTime.now().millisecondsSinceEpoch;
+        final salesRecords = items.asMap().entries.map((e) => {
+          'id': 'sale_${DateTime.now().microsecondsSinceEpoch}_${e.key}_${e.value.product.id}',
+          'shopId': shopId,
+          'productId': e.value.product.id,
+          'productName': e.value.product.name,
+          'quantity': e.value.quantity,
+          'price': e.value.product.price,
+          'timestamp': nowMs,
+          'orderType': 'takeaway',
+        }).toList();
+        await DatabaseHelper.instance.addSalesRecords(salesRecords);
+      } catch (e) {
+        debugPrint('Failed to save sales records locally after ECR print: $e');
+      }
+
       ref.read(takeawayCartProvider.notifier).clear();
       
       if (mounted) {
@@ -334,13 +370,79 @@ class _TakeawayScreenState extends ConsumerState<TakeawayScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Σφάλμα εκτύπωσης: $e'), backgroundColor: AppColors.error),
+          SnackBar(content: Text('Σφάλμα: $e'), backgroundColor: AppColors.error),
         );
       }
     } finally {
       if (mounted) {
         setState(() => _isPrinting = false);
       }
+    }
+  }
+
+  Future<void> _printToThermalPrinter(List<TakeawayCartItem> cartItems, double total) async {
+    final shopId = ref.read(currentShopIdProvider);
+    if (shopId == null) throw Exception('Δεν βρέθηκε κατάστημα.');
+
+    final repo = ref.read(printerRepositoryProvider);
+    final printers = await repo.getPrinters(shopId);
+    
+    final cashierPrinters = printers.where((p) => p.role == PrinterRole.cashier).toList();
+    if (cashierPrinters.isEmpty) {
+      throw Exception('Δεν βρέθηκε εκτυπωτής ταμείου για την εκτύπωση.');
+    }
+
+
+    // Fetch settings for header/footer
+    final settingsRepo = ref.read(settingsRepositoryProvider);
+    final config = await settingsRepo.getShopConfig(shopId);
+
+    final localAuth = ref.read(localAuthNotifierProvider);
+    final waiterName = localAuth.waiterName ?? 'Σερβιτόρος';
+
+    // Convert TakeawayCartItem to OrderItem
+    final List<OrderItem> printItems = cartItems.map((c) => OrderItem(
+      id: 'item_${DateTime.now().microsecondsSinceEpoch}',
+      orderId: 'takeaway',
+      productId: c.product.id,
+      productName: c.product.name,
+      quantity: c.quantity,
+      priceAtOrder: c.product.price,
+      department: c.product.department,
+      notes: '',
+      printStatus: 'printed_${DateTime.now().toIso8601String()}',
+    )).toList();
+
+    final jobs = cashierPrinters.map((printer) => PrintJob(
+      printer: printer,
+      tableName: 'ΠΑΚΕΤΟ',
+      waiterName: waiterName,
+      items: printItems,
+      timestamp: DateTime.now(),
+      header: config?.receiptHeader ?? 'ΠΑΚΕΤΟ',
+      footer: config?.receiptFooter,
+      logoPath: config?.logoPath,
+      stationName: config?.stationName,
+    )).toList();
+
+    await Future.wait(jobs.map((j) => repo.printJob(j)));
+
+    // Save sales locally upon successful print
+    try {
+      final nowMs = DateTime.now().millisecondsSinceEpoch;
+      final salesRecords = cartItems.asMap().entries.map((e) => {
+        'id': 'sale_${DateTime.now().microsecondsSinceEpoch}_${e.key}_${e.value.product.id}',
+        'shopId': shopId,
+        'productId': e.value.product.id,
+        'productName': e.value.product.name,
+        'quantity': e.value.quantity,
+        'price': e.value.product.price,
+        'timestamp': nowMs,
+        'orderType': 'takeaway',
+      }).toList();
+      await DatabaseHelper.instance.addSalesRecords(salesRecords);
+    } catch (e) {
+      debugPrint('Failed to save sales records locally: $e');
     }
   }
 }

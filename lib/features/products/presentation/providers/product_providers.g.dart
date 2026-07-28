@@ -6,7 +6,7 @@ part of 'product_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$productRepositoryHash() => r'5e67083183a6135262568cece50054c8ddedf200';
+String _$productRepositoryHash() => r'f2b3f6bc1fb43c7dd1da37ce3ae66a5fad528a06';
 
 /// See also [productRepository].
 @ProviderFor(productRepository)
@@ -24,7 +24,7 @@ final productRepositoryProvider = Provider<ProductRepository>.internal(
 // ignore: unused_element
 typedef ProductRepositoryRef = ProviderRef<ProductRepository>;
 String _$categoryRepositoryHash() =>
-    r'a362e3ff4d7ca96f19ec2cabc8c1f250a16a5c4e';
+    r'46ddf6156f1fcbbe10a23b72a86abd094e05ea67';
 
 /// See also [categoryRepository].
 @ProviderFor(categoryRepository)
@@ -221,7 +221,7 @@ class _ProductsByCategoryProviderElement
   String get categoryId => (origin as ProductsByCategoryProvider).categoryId;
 }
 
-String _$productActionsHash() => r'658ac383b0bebc8803035e6dfae821f60050d0d4';
+String _$productActionsHash() => r'f528f1b68726fa01173f3742a97db8db37a7766d';
 
 /// See also [ProductActions].
 @ProviderFor(ProductActions)

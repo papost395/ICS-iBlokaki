@@ -7,25 +7,40 @@ import 'package:order/features/settings/data/datasources/remote_settings_datasou
 import 'package:order/features/settings/data/models/shop_config_model.dart';
 import 'package:order/features/settings/domain/entities/shop_config.dart';
 import 'package:order/features/settings/domain/repositories/settings_repository.dart';
+import 'package:order/core/database/database_helper.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   SettingsRepositoryImpl({
     required this.localDataSource,
     required this.remoteDataSource,
     required this.pb,
+    this.isLocalMode = false,
   });
 
   final LocalSettingsDataSource localDataSource;
   final RemoteSettingsDataSource remoteDataSource;
   final PocketBase pb;
+  final bool isLocalMode;
 
   @override
-  Future<ShopConfig> getShopConfig(String shopId) {
+  Future<ShopConfig> getShopConfig(String shopId) async {
+    if (isLocalMode) {
+      final config = await DatabaseHelper.instance.getShopConfig(shopId);
+      if (config != null) return config;
+      // Fallback
+      return ShopConfig(id: 'local_config', shopId: shopId, receiptHeader: 'Τοπικό Κατάστημα', receiptFooter: 'Ευχαριστούμε!');
+    }
     return remoteDataSource.getShopConfig(shopId);
   }
 
   @override
   Stream<ShopConfig> watchShopConfig(String shopId) {
+    if (isLocalMode) {
+      // Just returning a future as stream for local mode. 
+      // Ideally this would be a proper stream if we had a reactive local DB.
+      return Stream.fromFuture(getShopConfig(shopId));
+    }
+
     final controller = StreamController<ShopConfig>.broadcast();
 
     remoteDataSource.getShopConfig(shopId).then(controller.add);
@@ -47,7 +62,11 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
-  Future<void> updateShopConfig(ShopConfig config) {
+  Future<void> updateShopConfig(ShopConfig config) async {
+    if (isLocalMode) {
+      await DatabaseHelper.instance.updateShopConfig(config);
+      return;
+    }
     return remoteDataSource.updateShopConfig(config);
   }
 

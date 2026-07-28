@@ -6,7 +6,7 @@ part of 'printer_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$printerRepositoryHash() => r'fbb57bd1658d8ccce259df87669e757b2a528c05';
+String _$printerRepositoryHash() => r'3d3a93ff7e90ea9e87a8cc6086c75126ba9d26ab';
 
 /// See also [printerRepository].
 @ProviderFor(printerRepository)
@@ -40,7 +40,7 @@ final printersStreamProvider = StreamProvider<List<PrinterDevice>>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef PrintersStreamRef = StreamProviderRef<List<PrinterDevice>>;
-String _$printerActionsHash() => r'736c680698658261f93c81630da313693a38971c';
+String _$printerActionsHash() => r'5d8ca579e6f767936f77965ce14cb215a48bf8d0';
 
 /// See also [PrinterActions].
 @ProviderFor(PrinterActions)

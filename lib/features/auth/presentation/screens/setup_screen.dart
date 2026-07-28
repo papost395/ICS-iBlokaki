@@ -6,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:order/core/providers/device_config_provider.dart';
 import 'package:order/core/providers/pocketbase_provider.dart';
 import 'package:order/core/theme/app_colors.dart';
+import 'package:order/core/providers/storage_mode_provider.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
@@ -267,7 +268,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                     width: double.infinity,
                     height: 54,
                     child: FilledButton.icon(
-                      onPressed: () => setState(() => _isScanning = true),
+                      // Disable scanning for now
+                      onPressed: null, // () => setState(() => _isScanning = true),
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -278,7 +280,51 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                       ),
                       icon: const Icon(Icons.camera_alt_rounded),
                       label: const Text(
-                        'Σάρωση QR Code',
+                        'Σάρωση QR Code (Απενεργοποιημένο)',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        // Start local mode
+                        final container = ProviderScope.containerOf(context);
+                        // Save local mode state
+                        ref.read(storageModeNotifierProvider.notifier).setLocalMode(true);
+                        
+                        setState(() => _isLoading = true);
+                        
+                        // We need to set the storage mode to true
+                        // I will import the provider at the top of the file.
+                        
+                        await ref.read(deviceConfigNotifierProvider.notifier).setConfig(
+                          apiUrl: 'local',
+                          shopId: 'local',
+                        );
+                        
+                        // Wait a bit
+                        await Future.delayed(const Duration(seconds: 1));
+                        if (mounted) {
+                          context.go('/login');
+                        }
+                      },
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: const BorderSide(color: AppColors.primary, width: 2),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      icon: const Icon(Icons.storage_rounded),
+                      label: const Text(
+                        'Χρήση Τοπικής Βάσης (Χωρίς Cloud)',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

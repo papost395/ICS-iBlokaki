@@ -102,7 +102,7 @@ class MainNavigationShell extends ConsumerWidget {
                           ),
                           const SizedBox(width: 10),
                           Text(
-                            'iBlokaki',
+                            'ΜΣΙ "Ηρώδοτος"',
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.bold,
@@ -156,26 +156,28 @@ class MainNavigationShell extends ConsumerWidget {
                   _onItemTapped(1, context);
                 },
               ),
-              ListTile(
-                leading: Icon(Icons.shopping_bag_outlined, color: selectedIndex == 2 ? AppColors.primary : textSecondary),
-                title: Text('Προϊόντα', style: TextStyle(color: selectedIndex == 2 ? AppColors.primary : textColor, fontWeight: selectedIndex == 2 ? FontWeight.bold : FontWeight.normal)),
-                selected: selectedIndex == 2,
-                selectedTileColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
-                onTap: () {
-                  Navigator.pop(context);
-                  _onItemTapped(2, context);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.settings_outlined, color: selectedIndex == 3 ? AppColors.primary : textSecondary),
-                title: Text('Ρυθμίσεις', style: TextStyle(color: selectedIndex == 3 ? AppColors.primary : textColor, fontWeight: selectedIndex == 3 ? FontWeight.bold : FontWeight.normal)),
-                selected: selectedIndex == 3,
-                selectedTileColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
-                onTap: () {
-                  Navigator.pop(context);
-                  _onItemTapped(3, context);
-                },
-              ),
+              if (localAuth.isAdmin) ...[
+                ListTile(
+                  leading: Icon(Icons.shopping_bag_outlined, color: selectedIndex == 2 ? AppColors.primary : textSecondary),
+                  title: Text('Προϊόντα', style: TextStyle(color: selectedIndex == 2 ? AppColors.primary : textColor, fontWeight: selectedIndex == 2 ? FontWeight.bold : FontWeight.normal)),
+                  selected: selectedIndex == 2,
+                  selectedTileColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _onItemTapped(2, context);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.settings_outlined, color: selectedIndex == 3 ? AppColors.primary : textSecondary),
+                  title: Text('Ρυθμίσεις', style: TextStyle(color: selectedIndex == 3 ? AppColors.primary : textColor, fontWeight: selectedIndex == 3 ? FontWeight.bold : FontWeight.normal)),
+                  selected: selectedIndex == 3,
+                  selectedTileColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _onItemTapped(3, context);
+                  },
+                ),
+              ],
               const Spacer(),
               Divider(color: isDark ? Colors.white10 : Colors.black12, height: 1),
               ListTile(

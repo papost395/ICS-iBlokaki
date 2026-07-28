@@ -11,6 +11,7 @@ _Waiter _$WaiterFromJson(Map<String, dynamic> json) => _Waiter(
   shopId: json['shopId'] as String,
   name: json['name'] as String,
   pin: json['pin'] as String,
+  isAdmin: json['isAdmin'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$WaiterToJson(_Waiter instance) => <String, dynamic>{
@@ -18,4 +19,5 @@ Map<String, dynamic> _$WaiterToJson(_Waiter instance) => <String, dynamic>{
   'shopId': instance.shopId,
   'name': instance.name,
   'pin': instance.pin,
+  'isAdmin': instance.isAdmin,
 };

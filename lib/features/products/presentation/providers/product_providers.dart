@@ -11,23 +11,30 @@ import 'package:order/features/products/domain/entities/product.dart';
 import 'package:order/features/products/domain/repositories/category_repository.dart';
 import 'package:order/features/products/domain/repositories/product_repository.dart';
 
+import 'package:order/core/providers/storage_mode_provider.dart';
+import 'package:order/core/database/database_helper.dart';
+
 part 'product_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 ProductRepository productRepository(Ref ref) {
   final pb = ref.watch(pocketBaseProvider);
+  final isLocalMode = ref.watch(storageModeNotifierProvider);
   return ProductRepositoryImpl(
     remoteDataSource: ProductRemoteDataSourceImpl(pb: pb),
     pb: pb,
+    isLocalMode: isLocalMode,
   );
 }
 
 @Riverpod(keepAlive: true)
 CategoryRepository categoryRepository(Ref ref) {
   final pb = ref.watch(pocketBaseProvider);
+  final isLocalMode = ref.watch(storageModeNotifierProvider);
   return CategoryRepositoryImpl(
     remoteDataSource: CategoryRemoteDataSourceImpl(pb: pb),
     pb: pb,
+    isLocalMode: isLocalMode,
   );
 }
 
@@ -67,10 +74,8 @@ class ProductActions extends _$ProductActions {
   FutureOr<void> build() {}
 
   Future<void> updateProduct(Product product) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final repo = ref.read(productRepositoryProvider);
-      await repo.updateProduct(product);
-    });
+    final repo = ref.read(productRepositoryProvider);
+    await repo.updateProduct(product);
+    ref.invalidate(productsStreamProvider);
   }
 }

@@ -273,6 +273,8 @@ class _EditPrinterScreenState extends ConsumerState<EditPrinterScreen> {
   bool _isUtf8 = false;
   bool _isCp737 = false;
   int _paperSize = 80;
+  bool _isDoubleSize = false;
+  bool _isExtraBold = false;
 
   List<BluetoothDevice> _bondedDevices = [];
   bool _isLoadingDevices = false;
@@ -362,6 +364,8 @@ class _EditPrinterScreenState extends ConsumerState<EditPrinterScreen> {
       _isUtf8 = p.isUtf8;
       _isCp737 = p.isCp737;
       _paperSize = p.paperSize;
+      _isDoubleSize = p.isDoubleSize;
+      _isExtraBold = p.isExtraBold;
     }
     if (_connectionType == ConnectionType.bluetooth) {
       _loadBluetoothDevices();
@@ -393,6 +397,8 @@ class _EditPrinterScreenState extends ConsumerState<EditPrinterScreen> {
       isUtf8: _isUtf8,
       isCp737: _isCp737,
       paperSize: _paperSize,
+      isDoubleSize: _isDoubleSize,
+      isExtraBold: _isExtraBold,
     );
 
     try {
@@ -510,17 +516,37 @@ class _EditPrinterScreenState extends ConsumerState<EditPrinterScreen> {
                           else if (_bondedDevices.isEmpty)
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  const Expanded(
-                                    child: Text(
-                                      'Δεν βρέθηκαν συζευγμένες συσκευές Bluetooth στο Android. Κάντε σύζευξη στις ρυθμίσεις της συσκευής σας.',
-                                      style: TextStyle(color: Colors.orange, fontSize: 13),
-                                    ),
+                                  Row(
+                                    children: [
+                                      const Expanded(
+                                        child: Text(
+                                          'Δεν βρέθηκαν συζευγμένες συσκευές Bluetooth στο Android. Κάντε σύζευξη στις ρυθμίσεις της συσκευής σας ή εισάγετε τη διεύθυνση MAC χειροκίνητα.',
+                                          style: TextStyle(color: Colors.orange, fontSize: 13),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.refresh),
+                                        onPressed: _loadBluetoothDevices,
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.refresh),
-                                    onPressed: _loadBluetoothDevices,
+                                  const SizedBox(height: 12),
+                                  TextFormField(
+                                    controller: _addressController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Χειροκίνητη εισαγωγή MAC Διεύθυνσης',
+                                      hintText: 'π.χ. 00:11:22:33:FF:EE',
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    validator: (val) {
+                                      if (val == null || val.trim().isEmpty) {
+                                        return 'Παρακαλώ εισάγετε μια διεύθυνση';
+                                      }
+                                      return null;
+                                    },
                                   ),
                                 ],
                               ),
@@ -538,39 +564,52 @@ class _EditPrinterScreenState extends ConsumerState<EditPrinterScreen> {
                                   } catch (_) {}
                                 }
 
-                                return DropdownButtonFormField<BluetoothDevice>(
-                                  value: selectedValue,
-                                  isExpanded: true,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Επιλογή Συσκευής Bluetooth',
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  items: _bondedDevices.map((device) {
-                                    return DropdownMenuItem<BluetoothDevice>(
-                                      value: device,
-                                      child: Text(
-                                        '${device.name ?? 'Unknown Device'} (${device.address})',
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
+                                return Column(
+                                  children: [
+                                    DropdownButtonFormField<BluetoothDevice>(
+                                      value: selectedValue,
+                                      isExpanded: true,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Επιλογή Συσκευής Bluetooth',
+                                        border: OutlineInputBorder(),
                                       ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (device) {
-                                    if (device != null) {
-                                      setState(() {
-                                        _addressController.text = device.address ?? '';
-                                        if (_nameController.text.trim().isEmpty) {
-                                          _nameController.text = device.name ?? '';
+                                      items: _bondedDevices.map((device) {
+                                        return DropdownMenuItem<BluetoothDevice>(
+                                          value: device,
+                                          child: Text(
+                                            '${device.name ?? 'Unknown Device'} (${device.address})',
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 1,
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (device) {
+                                        if (device != null) {
+                                          setState(() {
+                                            _addressController.text = device.address ?? '';
+                                            if (_nameController.text.trim().isEmpty) {
+                                              _nameController.text = device.name ?? '';
+                                            }
+                                          });
                                         }
-                                      });
-                                    }
-                                  },
-                                  validator: (val) {
-                                    if (val == null && _addressController.text.isEmpty) {
-                                      return 'Παρακαλώ επιλέξτε μια συσκευή';
-                                    }
-                                    return null;
-                                  },
+                                      },
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextFormField(
+                                      controller: _addressController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Χειροκίνητη εισαγωγή / επεξεργασία MAC Διεύθυνσης',
+                                        hintText: 'π.χ. 00:11:22:33:FF:EE',
+                                        border: OutlineInputBorder(),
+                                      ),
+                                      validator: (val) {
+                                        if (val == null || val.trim().isEmpty) {
+                                          return 'Παρακαλώ εισάγετε μια διεύθυνση';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
                                 );
                               }
                             ),
@@ -662,6 +701,16 @@ class _EditPrinterScreenState extends ConsumerState<EditPrinterScreen> {
                               if (val) {
                                 _isUtf8 = false;
                               }
+                            });
+                          },
+                        ),
+                        SwitchListTile(
+                          title: const Text('Έντονα Γράμματα (+1 pixel)'),
+                          value: _isExtraBold,
+                          contentPadding: EdgeInsets.zero,
+                          onChanged: (val) {
+                            setState(() {
+                              _isExtraBold = val;
                             });
                           },
                         ),

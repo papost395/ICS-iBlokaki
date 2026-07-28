@@ -36,7 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final waiter = await repo.getWaiterByPin(shopId, pin);
 
       if (waiter != null) {
-        ref.read(localAuthNotifierProvider.notifier).loginAsWaiter(waiter.id, waiter.name);
+        ref.read(localAuthNotifierProvider.notifier).loginAsWaiter(waiter.id, waiter.name, waiter.isAdmin);
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -98,14 +98,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.qr_code_scanner, color: Colors.grey),
-            tooltip: 'Επαναφορά Συσκευής (Νέο QR)',
+            icon: const Icon(Icons.restore, color: Colors.grey),
+            tooltip: 'Επαναφορά Συσκευής',
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   title: const Text('Επαναφορά Συσκευής;'),
-                  content: const Text('Θα διαγραφούν οι ρυθμίσεις και θα πρέπει να σκανάρετε ξανά το QR Code.'),
+                  content: const Text('Θα διαγραφούν οι ρυθμίσεις και θα μεταφερθείτε στην αρχική οθόνη.'),
                   actions: [
                     TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('ΑΚΥΡΟ')),
                     TextButton(

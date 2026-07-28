@@ -7,7 +7,11 @@ import 'package:order/features/printing/presentation/screens/manage_printers_scr
 import 'package:order/features/settings/presentation/screens/app_settings_screen.dart';
 import 'package:order/features/settings/presentation/screens/receipt_settings_screen.dart';
 import 'package:order/features/settings/presentation/screens/ecr_settings_screen.dart';
-
+import 'package:order/features/settings/presentation/screens/waiters_settings_screen.dart';
+import 'package:order/features/sales/presentation/screens/sales_screen.dart';
+import 'package:order/features/tables/presentation/screens/manage_tables_screen.dart';
+import 'package:order/core/providers/storage_mode_provider.dart';
+import 'package:go_router/go_router.dart';
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -38,7 +42,101 @@ class SettingsScreen extends ConsumerWidget {
                 children: [
 
                   const SizedBox(height: 8),
+
+                  // Cloud/Local Mode Switch
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final isLocalMode = ref.watch(storageModeNotifierProvider);
+                      return Card(
+                        color: cardBgColor,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        child: SwitchListTile(
+                          title: const Text(
+                            'ΛΕΙΤΟΥΡΓΙΑ ΤΟΠΙΚΗΣ ΒΑΣΗΣ',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: const Text(
+                            'Ενεργοποίηση αποθήκευσης χωρίς Cloud',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                          value: isLocalMode,
+                          activeColor: AppColors.primary,
+                          onChanged: (value) {
+                            ref.read(storageModeNotifierProvider.notifier).setLocalMode(value);
+                          },
+                          secondary: Icon(
+                            isLocalMode ? Icons.storage_rounded : Icons.cloud_done_rounded,
+                            color: AppColors.primary,
+                            size: 28,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   
+                  const SizedBox(height: 12),
+                  // Waiters Settings Card
+                  _buildDashboardCard(
+                    context: context,
+                    title: 'ΧΡΗΣΤΕΣ / ΣΕΡΒΙΤΟΡΟΙ',
+                    subtitle: 'Διαχείριση τοπικών χρηστών και PIN',
+                    icon: Icons.people_outline,
+                    cardBgColor: cardBgColor,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const WaitersSettingsScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Products Card
+                  _buildDashboardCard(
+                    context: context,
+                    title: 'ΠΡΟΪΟΝΤΑ & ΜΕΝΟΥ',
+                    subtitle: 'Επεξεργασία, εισαγωγή από CSV',
+                    icon: Icons.fastfood_outlined,
+                    cardBgColor: cardBgColor,
+                    onTap: () {
+                      context.push('/products');
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Tables Card
+                  _buildDashboardCard(
+                    context: context,
+                    title: 'ΤΡΑΠΕΖΙΑ',
+                    subtitle: 'Προσθήκη και διαχείριση τραπεζιών',
+                    icon: Icons.table_bar_outlined,
+                    cardBgColor: cardBgColor,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ManageTablesScreen(shopId: shopId)),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Sales Card
+                  _buildDashboardCard(
+                    context: context,
+                    title: 'ΠΩΛΗΣΕΙΣ',
+                    subtitle: 'Πωλήσεις ημέρας και εκτύπωση αναφοράς',
+                    icon: Icons.bar_chart_outlined,
+                    cardBgColor: cardBgColor,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SalesScreen()),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
                   // Printers Card
                   _buildDashboardCard(
                     context: context,

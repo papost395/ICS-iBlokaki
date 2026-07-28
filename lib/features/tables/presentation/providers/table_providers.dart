@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:order/core/providers/pocketbase_provider.dart';
+import 'package:order/core/providers/storage_mode_provider.dart';
 import 'package:order/features/auth/presentation/providers/auth_providers.dart';
 import 'package:order/features/tables/data/datasources/table_remote_datasource.dart';
 import 'package:order/features/tables/data/repositories/table_repository_impl.dart';
@@ -13,9 +14,11 @@ part 'table_providers.g.dart';
 @Riverpod(keepAlive: true)
 TableRepository tableRepository(Ref ref) {
   final pb = ref.watch(pocketBaseProvider);
+  final isLocalMode = ref.watch(storageModeNotifierProvider);
   return TableRepositoryImpl(
     remoteDataSource: TableRemoteDataSourceImpl(pb: pb),
     pb: pb,
+    isLocalMode: isLocalMode,
   );
 }
 
@@ -38,6 +41,7 @@ class TableActions extends _$TableActions {
   }) async {
     final repo = ref.read(tableRepositoryProvider);
     await repo.updateTableStatus(tableId: tableId, status: status);
+    ref.invalidate(tablesStreamProvider);
   }
 
   Future<void> addTable({
@@ -46,11 +50,13 @@ class TableActions extends _$TableActions {
   }) async {
     final repo = ref.read(tableRepositoryProvider);
     await repo.addTable(shopId, name);
+    ref.invalidate(tablesStreamProvider);
   }
 
   Future<void> deleteTable(String id) async {
     final repo = ref.read(tableRepositoryProvider);
     await repo.deleteTable(id);
+    ref.invalidate(tablesStreamProvider);
   }
 
   Future<void> updateTableName({
@@ -59,5 +65,6 @@ class TableActions extends _$TableActions {
   }) async {
     final repo = ref.read(tableRepositoryProvider);
     await repo.updateTableName(tableId: tableId, name: name);
+    ref.invalidate(tablesStreamProvider);
   }
 }

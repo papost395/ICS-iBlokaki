@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:image/image.dart' as img;
 import 'package:pocketbase/pocketbase.dart';
 import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -13,17 +14,20 @@ import 'package:order/features/printing/domain/repositories/printer_repository.d
 import 'package:order/features/settings/domain/repositories/settings_repository.dart';
 import 'package:order/features/printing/data/datasources/sunmi_cloud_printer.dart';
 import 'package:logger/logger.dart';
+import 'package:order/core/database/database_helper.dart';
 
 class PrinterRepositoryImpl implements PrinterRepository {
   PrinterRepositoryImpl({
     required this.remoteDataSource,
     required this.pb,
     required this.settingsRepo,
+    this.isLocalMode = false,
   });
 
   final PrinterRemoteDataSource remoteDataSource;
   final PocketBase pb;
   final SettingsRepository settingsRepo;
+  final bool isLocalMode;
   final _bluetooth = BlueThermalPrinter.instance;
 
   var logger = Logger(
@@ -39,27 +43,47 @@ class PrinterRepositoryImpl implements PrinterRepository {
   );
 
   @override
-  Future<List<PrinterDevice>> getPrinters(String shopId) {
+  Future<List<PrinterDevice>> getPrinters(String shopId) async {
+    if (isLocalMode) {
+      return await DatabaseHelper.instance.getPrinters(shopId);
+    }
     return remoteDataSource.getPrinters(shopId);
   }
 
   @override
-  Future<PrinterDevice> addPrinter(PrinterDevice printer) {
+  Future<PrinterDevice> addPrinter(PrinterDevice printer) async {
+    if (isLocalMode) {
+      final p = printer.copyWith(id: 'pr_${DateTime.now().millisecondsSinceEpoch}');
+      await DatabaseHelper.instance.addPrinter(p);
+      return p;
+    }
     return remoteDataSource.addPrinter(printer);
   }
 
   @override
-  Future<void> deletePrinter(String id) {
+  Future<void> deletePrinter(String id) async {
+    if (isLocalMode) {
+      await DatabaseHelper.instance.deletePrinter(id);
+      return;
+    }
     return remoteDataSource.deletePrinter(id);
   }
 
   @override
-  Future<PrinterDevice> updatePrinter(PrinterDevice printer) {
+  Future<PrinterDevice> updatePrinter(PrinterDevice printer) async {
+    if (isLocalMode) {
+      await DatabaseHelper.instance.updatePrinter(printer);
+      return printer;
+    }
     return remoteDataSource.updatePrinter(printer);
   }
 
   @override
   Stream<List<PrinterDevice>> watchPrinters(String shopId) {
+    if (isLocalMode) {
+      return Stream.fromFuture(DatabaseHelper.instance.getPrinters(shopId));
+    }
+
     final controller = StreamController<List<PrinterDevice>>.broadcast();
     Future<UnsubscribeFunc>? subscriptionFuture;
 
@@ -295,11 +319,13 @@ class PrinterRepositoryImpl implements PrinterRepository {
     final bytes = <int>[];
     final int width = printer.paperSize == 58 ? 32 : 48;
     final String separator = '-' * width;
+    final int baseBold = printer.isExtraBold ? 1 : 0;
 
     // 1. Initialize printer
     bytes.addAll([0x1B, 0x40]);
     // 2. Select encoding dynamically
     bytes.addAll(_compileEncodingHeader(printer));
+    if (baseBold == 1) bytes.addAll([0x1B, 0x45, 1]);
 
     // 3. Header (Center)
     if (header.isNotEmpty) {
@@ -313,7 +339,7 @@ class PrinterRepositoryImpl implements PrinterRepository {
     bytes.addAll([0x1D, 0x21, 0x11]); // Double height/width
     bytes.addAll(_encodeText('ΔΟΚΙΜΑΣΤΙΚΗ ΕΚΤΥΠΩΣΗ\n(TEST PRINT)\n\n', printer));
     bytes.addAll([0x1D, 0x21, 0x00]); // Reset size
-    bytes.addAll([0x1B, 0x45, 0]); // Bold off
+    bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
 
     // 5. Details (Left)
     bytes.addAll([0x1B, 0x61, 0]); // Left
@@ -330,11 +356,73 @@ class PrinterRepositoryImpl implements PrinterRepository {
       bytes.addAll(_encodeText('$footer\n', printer));
     }
 
-    // 7. Feed lines and cut paper
-    bytes.addAll([0x1B, 0x64, 4]); // Feed 4 lines
-    bytes.addAll([0x1D, 0x56, 66, 0]); // Cut paper
+    // Feed and cut paper
+    bytes.addAll([0x0A, 0x0A, 0x0A]);
+    bytes.addAll([0x1D, 0x56, 0x42, 0x00]);
 
     return bytes;
+  }
+
+  /// Encodes a logo file into ESC/POS Raster bit image (GS v 0) bytes.
+  List<int>? _encodeLogo(String logoPath, int paperWidthChars) {
+    try {
+      final file = File(logoPath);
+      if (!file.existsSync()) return null;
+
+      final img.Image? original = img.decodeImage(file.readAsBytesSync());
+      if (original == null) return null;
+
+      // Determine max width in pixels (8 dots per char). 
+      // 58mm -> 32 chars = 384 px. 80mm -> 48 chars = 512 or 576 px (using 512 to be safe).
+      final int maxWidth = paperWidthChars == 32 ? 384 : 512;
+      
+      img.Image resized = original;
+      if (original.width > maxWidth) {
+        resized = img.copyResize(original, width: maxWidth, maintainAspect: true);
+      }
+      
+      // Convert to luminance (grayscale)
+      img.Image grayscale = img.grayscale(resized);
+      // Threshold to black/white (1-bit)
+      img.Image bwImage = img.luminanceThreshold(grayscale, threshold: 0.5);
+
+      final widthBytes = (bwImage.width + 7) ~/ 8;
+      final height = bwImage.height;
+
+      final List<int> rasterData = List.filled(widthBytes * height, 0);
+
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < bwImage.width; x++) {
+          final pixel = bwImage.getPixel(x, y);
+          // In 1-bit, luminance > 0 means white, 0 means black.
+          // Thermal printers print black where bits are 1.
+          if (pixel.r == 0) { 
+            final byteIndex = y * widthBytes + (x ~/ 8);
+            final bitIndex = 7 - (x % 8);
+            rasterData[byteIndex] |= (1 << bitIndex);
+          }
+        }
+      }
+
+      final bytes = <int>[];
+      // Align center
+      bytes.addAll([0x1B, 0x61, 1]);
+      // GS v 0 0 xL xH yL yH
+      bytes.addAll([0x1D, 0x76, 0x30, 0x00]);
+      bytes.add(widthBytes % 256);
+      bytes.add(widthBytes ~/ 256);
+      bytes.add(height % 256);
+      bytes.add(height ~/ 256);
+      bytes.addAll(rasterData);
+      
+      // Feed a little after logo
+      bytes.addAll([0x1B, 0x64, 1]); // Feed 1 line
+
+      return bytes;
+    } catch (e) {
+      logger.e('Error encoding logo: $e');
+      return null;
+    }
   }
 
   /// Compile print job to ESC/POS binary format.
@@ -342,11 +430,21 @@ class PrinterRepositoryImpl implements PrinterRepository {
     final bytes = <int>[];
     final int width = job.printer.paperSize == 58 ? 32 : 48;
     final String separator = '-' * width;
+    final int baseBold = job.printer.isExtraBold ? 1 : 0;
 
     // 1. Initialize printer
     bytes.addAll([0x1B, 0x40]);
     // 2. Select encoding dynamically
     bytes.addAll(_compileEncodingHeader(job.printer));
+    if (baseBold == 1) bytes.addAll([0x1B, 0x45, 1]);
+
+    // 2.5 Print Logo if exists
+    if (job.logoPath != null && job.logoPath!.isNotEmpty) {
+      final logoBytes = _encodeLogo(job.logoPath!, width);
+      if (logoBytes != null) {
+        bytes.addAll(logoBytes);
+      }
+    }
 
     // Determine if this is a reprint early
     bool isReprint = false;
@@ -367,13 +465,13 @@ class PrinterRepositoryImpl implements PrinterRepository {
     // 3. Header (Center)
     if (job.header != null && job.header!.isNotEmpty) {
       bytes.addAll([0x1B, 0x61, 1]); // Center
-      bytes.addAll(_encodeText('${job.header}\n\n', job.printer));
+      bytes.addAll(_encodeText('${job.header}\n', job.printer));
     } else {
       bytes.addAll([0x1B, 0x61, 1]); // Center
       bytes.addAll([0x1B, 0x45, 1]); // Bold on
-      bytes.addAll(_encodeText('Δελτίο Παραγγελίας\n\n', job.printer));
+      bytes.addAll(_encodeText('Δελτίο Παραγγελίας\n', job.printer));
       bytes.addAll([0x1D, 0x21, 0x00]); // Reset size
-      bytes.addAll([0x1B, 0x45, 0]); // Bold off
+      bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
     }
 
     // Reprint Banner directly under header
@@ -381,13 +479,16 @@ class PrinterRepositoryImpl implements PrinterRepository {
       bytes.addAll([0x1B, 0x61, 1]); // Center
       bytes.addAll([0x1B, 0x45, 1]); // Bold on
       bytes.addAll(_encodeText('*** ΕΠΑΝΕΚΤΥΠΩΣΗ ***\n', job.printer));
-      bytes.addAll([0x1B, 0x45, 0]); // Bold off
+      bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
     }
 
     // 4. Header details (Left)
     bytes.addAll([0x1B, 0x61, 0]); // Left
     if (job.printer.paperSize == 58) {
       bytes.addAll(_encodeText('Τραπέζι: ${job.tableName}\n', job.printer));
+      if (job.stationName != null && job.stationName!.isNotEmpty) {
+        bytes.addAll(_encodeText('Πόστο: ${job.stationName}\n', job.printer));
+      }
       bytes.addAll(_encodeText('Σερβιτόρος: ${job.waiterName}\n', job.printer));
       if (isReprint) {
         bytes.addAll(_encodeText('Επανεκτύπωση: ${DateTime.now().toLocal().toString().substring(0, 19)}\n', job.printer));
@@ -401,6 +502,9 @@ class PrinterRepositoryImpl implements PrinterRepository {
       }
     } else {
       bytes.addAll(_encodeText('${_fitLine('Τραπέζι: ${job.tableName}', width)}\n', job.printer));
+      if (job.stationName != null && job.stationName!.isNotEmpty) {
+        bytes.addAll(_encodeText('${_fitLine('Πόστο: ${job.stationName}', width)}\n', job.printer));
+      }
       bytes.addAll(_encodeText('${_fitLine('Σερβιτόρος: ${job.waiterName}', width)}\n', job.printer));
       if (isReprint) {
         bytes.addAll(_encodeText('${_fitLine('Επανεκτύπωση: ${DateTime.now().toLocal().toString().substring(0, 19)}', width)}\n', job.printer));
@@ -426,40 +530,54 @@ class PrinterRepositoryImpl implements PrinterRepository {
       final String space = ' ';
 
       if (isCashier) {
-        final col1 = 'Προϊόν'.padRight(nameWidth);
-        //final col2 = 'Τιμή'.padLeft(priceWidth);
-        final col3 = 'ΤΜΧ'.padLeft(qtyWidth);
-        //bytes.addAll(_encodeText('$col1$space$col2$space$col3\n', job.printer));
-        bytes.addAll(_encodeText('$col1$space$space$space$space$col3\n', job.printer));
+        final int nameW = 16;
+        final int priceW = 7;
+        final int qtyW = 7;
+        final col1 = 'Προϊόν'.padRight(nameW);
+        final col2 = 'Τιμή'.padLeft(priceW);
+        final col3 = 'ΤΜΧ'.padLeft(qtyW);
+        bytes.addAll(_encodeText('$col1$space$col2$space$col3\n', job.printer));
       } else {
         final int kitchenNameWidth = nameWidth + priceWidth + space.length;
         final col1 = 'Προϊόν'.padRight(kitchenNameWidth);
         final col2 = 'ΤΜΧ'.padLeft(qtyWidth);
         bytes.addAll(_encodeText('$col1$space$space$space$col2\n\n', job.printer));
       }
-      bytes.addAll([0x1B, 0x45, 0]); // Bold off
+      bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
     }
 
     // 6. Items
     for (final item in job.items) {
+      if (item.productId == 'header') {
+        bytes.addAll([0x1B, 0x45, 1]); // Bold on
+        bytes.addAll(_encodeText('\n${item.productName}\n', job.printer));
+        bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
+        continue;
+      }
+
       if (job.printer.paperSize == 58) {
         final int nameWidth = 18;
-        final int priceWidth = 6;
         final int qtyWidth = 6;
         final String space = ' ';
 
         String line;
         if (isCashier) {
-          final rawName = item.productName.length > nameWidth
-              ? item.productName.substring(0, nameWidth)
+          final int nmWidth = 16;
+          final int priceWidth = 7;
+          final int qtWidth = 7;
+          
+          final priceStr = item.priceAtOrder.toStringAsFixed(2).padLeft(priceWidth);
+          final qtyStr = item.quantity.toString().padLeft(qtWidth);
+          
+          final rawName = item.productName.length > nmWidth
+              ? item.productName.substring(0, nmWidth)
               : item.productName;
-          final name = rawName.padRight(nameWidth);
-          //final price = item.priceAtOrder.toStringAsFixed(2).padLeft(priceWidth);
-          final qty = item.quantity.toString().padLeft(qtyWidth);
-          line = '$name$space$space$space$space$space$qty';
+          final nameStr = rawName.padRight(nmWidth);
+          
+          line = '$nameStr $priceStr $qtyStr';
         } else {
           bytes.addAll([0x1B, 0x45, 1]); // Bold quantity in kitchen
-          final int kitchenNameWidth = nameWidth + priceWidth + space.length;
+          final int kitchenNameWidth = 25;
           final rawName = item.productName.length > kitchenNameWidth
               ? item.productName.substring(0, kitchenNameWidth)
               : item.productName;
@@ -469,7 +587,7 @@ class PrinterRepositoryImpl implements PrinterRepository {
         }
         
         bytes.addAll(_encodeText('$line\n', job.printer));
-        bytes.addAll([0x1B, 0x45, 0]); // Bold off
+        bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
 
         if (item.notes.isNotEmpty) {
           bytes.addAll(_encodeText('  * Σημείωση: ${item.notes}\n', job.printer));
@@ -477,24 +595,27 @@ class PrinterRepositoryImpl implements PrinterRepository {
       } else {
         // 80mm formatting
         if (isCashier) {
-          // Cashier 80mm layout (48 chars total)
-          // 4 spaces inwards -> Name(28) + Price(8) + Qty(8) + "    " = 48
+          final int nameWidth = 28;
+          final int priceWidth = 5;
+          final int qtyWidth = 8;
+          
           final price = item.priceAtOrder.toStringAsFixed(2);
           final qty = item.quantity.toString();
-          final nameStr = _truncate(item.productName, 28).padRight(28);
-          final priceStr = _truncate(price, 8).padLeft(8);
-          final qtyStr = _truncate(qty, 8).padLeft(8);
+          final nameStr = _truncate(item.productName, nameWidth).padRight(nameWidth);
+          final priceStr = _truncate(price, priceWidth).padLeft(priceWidth);
+          final qtyStr = _truncate(qty, qtyWidth).padLeft(qtyWidth);
           
-          final line = '$nameStr$priceStr$qtyStr    ';
+          final line = '$nameStr$priceStr$qtyStr';
           bytes.addAll(_encodeText('$line\n', job.printer));
         } else {
-          // Kitchen 80mm layout (48 chars total)
-          // 4 spaces inwards -> Name(36) + Qty(8) + "    " = 48
-          final qty = item.quantity.toString();
-          final nameStr = _truncate(item.productName, 36).padRight(36);
-          final qtyStr = _truncate(qty, 8).padLeft(8);
+          final int nameWidth = 36;
+          final int qtyWidth = 7;
           
-          final line = '$nameStr$qtyStr    ';
+          final qty = item.quantity.toString();
+          final nameStr = _truncate(item.productName, nameWidth).padRight(nameWidth);
+          final qtyStr = _truncate(qty, qtyWidth).padLeft(qtyWidth);
+          
+          final line = '$nameStr$qtyStr';
           bytes.addAll(_encodeText('$line\n', job.printer));
         }
 
@@ -504,17 +625,20 @@ class PrinterRepositoryImpl implements PrinterRepository {
       }
     }
 
-    if (job.printer.paperSize == 80) {
-      bytes.addAll(_encodeText('$separator\n', job.printer));
+    bytes.addAll(_encodeText('$separator\n', job.printer));
 
-      // 7. Total for cashier (80mm only)
-      if (isCashier && job.items.isNotEmpty) {
-        final total = job.items.fold<double>(0, (sum, i) => sum + (i.priceAtOrder * i.quantity));
-        bytes.addAll([0x1B, 0x45, 1]); // Bold
-        final totalLine = _buildRow2('ΣΥΝΟΛΟ', '€${total.toStringAsFixed(2)}', 39, 9);
+    // 7. Total for cashier
+    if (isCashier && job.items.isNotEmpty) {
+      final total = job.items.fold<double>(0, (sum, i) => sum + (i.priceAtOrder * i.quantity));
+      bytes.addAll([0x1B, 0x45, 1]); // Bold
+      if (job.printer.paperSize == 80) {
+        final totalLine = _buildRow2('ΣΥΝΟΛΟ', '${total.toStringAsFixed(2)} EUR', 32, 14);
         bytes.addAll(_encodeText('$totalLine\n', job.printer));
-        bytes.addAll([0x1B, 0x45, 0]); // Bold off
+      } else {
+        final totalLine = _buildRow2('ΣΥΝΟΛΟ', '${total.toStringAsFixed(2)} EUR', 16, 12);
+        bytes.addAll(_encodeText('$totalLine\n', job.printer));
       }
+      bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
     }
 
     // 8. Footer (Center)
@@ -523,8 +647,14 @@ class PrinterRepositoryImpl implements PrinterRepository {
       bytes.addAll(_encodeText('\n${job.footer}\n', job.printer));
     }
 
+    // Legal notice (Center, Bold)
+    bytes.addAll([0x1B, 0x61, 1]); // Center
+    bytes.addAll([0x1B, 0x45, 1]); // Bold on
+    bytes.addAll(_encodeText('\nΤο παρόν στοιχείο δεν αποτελεί\nφορολογική απόδειξη\n\n', job.printer));
+    bytes.addAll([0x1B, 0x45, baseBold]); // Bold off
+
     // 9. Feed lines and cut paper
-    bytes.addAll([0x1B, 0x64, 4]); // Feed 4 lines
+    bytes.addAll([0x1B, 0x64, 2]); // Feed 2 lines
     bytes.addAll([0x1D, 0x56, 66, 0]); // Cut paper
 
     return bytes;

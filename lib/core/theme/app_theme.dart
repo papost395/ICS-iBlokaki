@@ -12,15 +12,15 @@ class AppTheme {
           seedColor: AppColors.primary,
           brightness: Brightness.light,
         ),
-        textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+        textTheme: ThemeData.light().textTheme,
         scaffoldBackgroundColor: AppColors.surfaceLight,
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           centerTitle: true,
           elevation: 0,
           scrolledUnderElevation: 1,
           backgroundColor: AppColors.surfaceLight,
-          iconTheme: const IconThemeData(color: AppColors.textDark),
-          titleTextStyle: GoogleFonts.inter(
+          iconTheme: IconThemeData(color: AppColors.textDark),
+          titleTextStyle: TextStyle(
             color: AppColors.textDark,
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -85,15 +85,15 @@ class AppTheme {
           seedColor: AppColors.primary,
           brightness: Brightness.dark,
         ),
-        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+        textTheme: ThemeData.dark().textTheme,
         scaffoldBackgroundColor: AppColors.surfaceDark,
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           centerTitle: true,
           elevation: 0,
           scrolledUnderElevation: 1,
           backgroundColor: AppColors.surfaceDark,
-          iconTheme: const IconThemeData(color: AppColors.textLight),
-          titleTextStyle: GoogleFonts.inter(
+          iconTheme: IconThemeData(color: AppColors.textLight),
+          titleTextStyle: TextStyle(
             color: AppColors.textLight,
             fontSize: 18,
             fontWeight: FontWeight.w600,

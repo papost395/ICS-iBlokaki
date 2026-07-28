@@ -363,7 +363,7 @@ class TablesScreen extends ConsumerWidget {
                                 );
                                 if (confirm == true) {
                                   ref.read(tableActionsProvider.notifier).updateStatus(tableId: table.id, status: const Paid());
-                                  ref.read(orderActionsProvider.notifier).cancelActiveOrdersForTable(tableId: table.id);
+                                  ref.read(orderActionsProvider.notifier).completeActiveOrdersForTable(tableId: table.id);
                                 }
                               },
                             ),

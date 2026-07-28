@@ -6,7 +6,7 @@ part of 'order_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$orderRepositoryHash() => r'cc7186d0ea82b6f084f879b1f0098e9f4ed7b596';
+String _$orderRepositoryHash() => r'34b05bf751d51a46ac666ef78f73e39ffc448279';
 
 /// See also [orderRepository].
 @ProviderFor(orderRepository)
@@ -183,7 +183,7 @@ class _OrderHistoryProviderElement
   String get tableId => (origin as OrderHistoryProvider).tableId;
 }
 
-String _$orderActionsHash() => r'dc7194924025d670e5a04711c71af907d74a8b24';
+String _$orderActionsHash() => r'3209ed5e0bc0ae817ef69ae4d73f61b5203f1296';
 
 /// See also [OrderActions].
 @ProviderFor(OrderActions)

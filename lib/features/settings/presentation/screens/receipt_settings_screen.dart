@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:order/core/theme/app_colors.dart';
 import 'package:order/features/settings/domain/entities/shop_config.dart';
 import 'package:order/features/settings/presentation/providers/settings_providers.dart';
@@ -14,14 +18,17 @@ class ReceiptSettingsScreen extends ConsumerStatefulWidget {
 class _ReceiptSettingsScreenState extends ConsumerState<ReceiptSettingsScreen> {
   final _headerController = TextEditingController();
   final _footerController = TextEditingController();
+  final _stationController = TextEditingController();
   bool _isSplitPrinting = false;
   bool _isSaving = false;
+  String? _logoPath;
   ShopConfig? _loadedConfig;
 
   @override
   void dispose() {
     _headerController.dispose();
     _footerController.dispose();
+    _stationController.dispose();
     super.dispose();
   }
 
@@ -30,7 +37,9 @@ class _ReceiptSettingsScreenState extends ConsumerState<ReceiptSettingsScreen> {
       _loadedConfig = config;
       _headerController.text = config.receiptHeader;
       _footerController.text = config.receiptFooter;
+      _stationController.text = config.stationName ?? '';
       _isSplitPrinting = config.isSplitPrintingEnabled;
+      _logoPath = config.logoPath;
     }
   }
 
@@ -43,11 +52,14 @@ class _ReceiptSettingsScreenState extends ConsumerState<ReceiptSettingsScreen> {
     final updated = current.copyWith(
       receiptHeader: _headerController.text.trim(),
       receiptFooter: _footerController.text.trim(),
+      stationName: _stationController.text.trim().isEmpty ? null : _stationController.text.trim(),
       isSplitPrintingEnabled: _isSplitPrinting,
+      logoPath: _logoPath,
     );
 
     try {
       await ref.read(settingsRepositoryProvider).updateShopConfig(updated);
+      ref.invalidate(shopConfigStreamProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Οι ρυθμίσεις απόδειξης αποθηκεύτηκαν!'), backgroundColor: AppColors.success),
@@ -62,6 +74,37 @@ class _ReceiptSettingsScreenState extends ConsumerState<ReceiptSettingsScreen> {
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+  }
+
+  Future<void> _pickLogo() async {
+    final picker = ImagePicker();
+    final xfile = await picker.pickImage(source: ImageSource.gallery);
+    if (xfile == null) return;
+
+    try {
+      final docDir = await getApplicationDocumentsDirectory();
+      final ext = p.extension(xfile.path);
+      final newPath = p.join(docDir.path, 'receipt_logo$ext');
+      
+      final file = File(xfile.path);
+      await file.copy(newPath);
+
+      setState(() {
+        _logoPath = newPath;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Σφάλμα αποθήκευσης λογοτύπου: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
+  void _removeLogo() {
+    setState(() {
+      _logoPath = null;
+    });
   }
 
   @override
@@ -107,12 +150,47 @@ class _ReceiptSettingsScreenState extends ConsumerState<ReceiptSettingsScreen> {
                             activeColor: AppColors.primary,
                           ),
                           const Divider(height: 32),
+                          const Text('Λογότυπο Απόδειξης', style: TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          if (_logoPath != null && File(_logoPath!).existsSync())
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.file(
+                                  File(_logoPath!),
+                                  height: 100,
+                                  fit: BoxFit.contain,
+                                ),
+                                const SizedBox(height: 8),
+                                OutlinedButton.icon(
+                                  onPressed: _removeLogo,
+                                  icon: const Icon(Icons.delete, color: AppColors.error),
+                                  label: const Text('Αφαίρεση', style: TextStyle(color: AppColors.error)),
+                                ),
+                              ],
+                            )
+                          else
+                            OutlinedButton.icon(
+                              onPressed: _pickLogo,
+                              icon: const Icon(Icons.image),
+                              label: const Text('Επιλογή Λογότυπου (Downloads/Photos)'),
+                            ),
+                          const SizedBox(height: 24),
                           TextFormField(
                             controller: _headerController,
                             maxLines: 3,
                             decoration: const InputDecoration(
                               labelText: 'Κεφαλίδα Απόδειξης (Header)',
                               hintText: 'π.χ. Όνομα καταστήματος, ΑΦΜ...',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            controller: _stationController,
+                            decoration: const InputDecoration(
+                              labelText: 'Όνομα Πόστου / Σταθμού (π.χ. Ταμείο, Κρέας, Πόρτα)',
+                              hintText: 'Θα εκτυπώνεται πάνω από τον σερβιτόρο',
                               border: OutlineInputBorder(),
                             ),
                           ),

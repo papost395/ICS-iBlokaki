@@ -20,6 +20,8 @@ _PrinterDevice _$PrinterDeviceFromJson(Map<String, dynamic> json) =>
       isUtf8: json['isUtf8'] as bool? ?? false,
       isCp737: json['isCp737'] as bool? ?? false,
       paperSize: (json['paperSize'] as num?)?.toInt() ?? 80,
+      isDoubleSize: json['isDoubleSize'] as bool? ?? false,
+      isExtraBold: json['isExtraBold'] as bool? ?? false,
     );
 
 Map<String, dynamic> _$PrinterDeviceToJson(_PrinterDevice instance) =>
@@ -33,6 +35,8 @@ Map<String, dynamic> _$PrinterDeviceToJson(_PrinterDevice instance) =>
       'isUtf8': instance.isUtf8,
       'isCp737': instance.isCp737,
       'paperSize': instance.paperSize,
+      'isDoubleSize': instance.isDoubleSize,
+      'isExtraBold': instance.isExtraBold,
     };
 
 const _$ConnectionTypeEnumMap = {

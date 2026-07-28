@@ -12,6 +12,8 @@ _ShopConfig _$ShopConfigFromJson(Map<String, dynamic> json) => _ShopConfig(
   isSplitPrintingEnabled: json['isSplitPrintingEnabled'] as bool? ?? false,
   receiptHeader: json['receiptHeader'] as String? ?? '',
   receiptFooter: json['receiptFooter'] as String? ?? '',
+  logoPath: json['logoPath'] as String?,
+  stationName: json['stationName'] as String?,
 );
 
 Map<String, dynamic> _$ShopConfigToJson(_ShopConfig instance) =>
@@ -21,4 +23,6 @@ Map<String, dynamic> _$ShopConfigToJson(_ShopConfig instance) =>
       'isSplitPrintingEnabled': instance.isSplitPrintingEnabled,
       'receiptHeader': instance.receiptHeader,
       'receiptFooter': instance.receiptFooter,
+      'logoPath': instance.logoPath,
+      'stationName': instance.stationName,
     };

@@ -10,6 +10,7 @@ import 'package:order/features/auth/data/repositories/waiter_repository_impl.dar
 import 'package:order/features/auth/domain/repositories/waiter_repository.dart';
 import 'package:order/features/auth/domain/entities/waiter.dart';
 import 'package:order/core/providers/device_config_provider.dart';
+import 'package:order/core/providers/storage_mode_provider.dart';
 
 part 'auth_providers.g.dart';
 
@@ -60,7 +61,8 @@ class LocalAuthState {
   final LocalRole role;
   final String? waiterId;
   final String? waiterName;
-  const LocalAuthState({required this.role, this.waiterId, this.waiterName});
+  final bool isAdmin;
+  const LocalAuthState({required this.role, this.waiterId, this.waiterName, this.isAdmin = false});
 }
 
 @Riverpod(keepAlive: true)
@@ -70,8 +72,8 @@ class LocalAuthNotifier extends _$LocalAuthNotifier {
     return const LocalAuthState(role: LocalRole.none);
   }
 
-  void loginAsWaiter(String waiterId, String waiterName) {
-    state = LocalAuthState(role: LocalRole.waiter, waiterId: waiterId, waiterName: waiterName);
+  void loginAsWaiter(String waiterId, String waiterName, bool isAdmin) {
+    state = LocalAuthState(role: LocalRole.waiter, waiterId: waiterId, waiterName: waiterName, isAdmin: isAdmin);
   }
 
   void logout() {
@@ -82,8 +84,10 @@ class LocalAuthNotifier extends _$LocalAuthNotifier {
 @Riverpod(keepAlive: true)
 WaiterRepository waiterRepository(Ref ref) {
   final pb = ref.watch(pocketBaseProvider);
+  final isLocalMode = ref.watch(storageModeNotifierProvider);
   return WaiterRepositoryImpl(
     remoteDataSource: WaiterRemoteDataSourceImpl(pb: pb),
+    isLocalMode: isLocalMode,
   );
 }
 

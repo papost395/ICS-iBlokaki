@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Waiter {
 
- String get id; String get shopId; String get name; String get pin;
+ String get id; String get shopId; String get name; String get pin; bool get isAdmin;
 /// Create a copy of Waiter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $WaiterCopyWith<Waiter> get copyWith => _$WaiterCopyWithImpl<Waiter>(this as Wai
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Waiter&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.name, name) || other.name == name)&&(identical(other.pin, pin) || other.pin == pin));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Waiter&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.name, name) || other.name == name)&&(identical(other.pin, pin) || other.pin == pin)&&(identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,shopId,name,pin);
+int get hashCode => Object.hash(runtimeType,id,shopId,name,pin,isAdmin);
 
 @override
 String toString() {
-  return 'Waiter(id: $id, shopId: $shopId, name: $name, pin: $pin)';
+  return 'Waiter(id: $id, shopId: $shopId, name: $name, pin: $pin, isAdmin: $isAdmin)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $WaiterCopyWith<$Res>  {
   factory $WaiterCopyWith(Waiter value, $Res Function(Waiter) _then) = _$WaiterCopyWithImpl;
 @useResult
 $Res call({
- String id, String shopId, String name, String pin
+ String id, String shopId, String name, String pin, bool isAdmin
 });
 
 
@@ -65,13 +65,14 @@ class _$WaiterCopyWithImpl<$Res>
 
 /// Create a copy of Waiter
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? shopId = null,Object? name = null,Object? pin = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? shopId = null,Object? name = null,Object? pin = null,Object? isAdmin = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,shopId: null == shopId ? _self.shopId : shopId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,pin: null == pin ? _self.pin : pin // ignore: cast_nullable_to_non_nullable
-as String,
+as String,isAdmin: null == isAdmin ? _self.isAdmin : isAdmin // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -156,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String shopId,  String name,  String pin)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String shopId,  String name,  String pin,  bool isAdmin)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Waiter() when $default != null:
-return $default(_that.id,_that.shopId,_that.name,_that.pin);case _:
+return $default(_that.id,_that.shopId,_that.name,_that.pin,_that.isAdmin);case _:
   return orElse();
 
 }
@@ -177,10 +178,10 @@ return $default(_that.id,_that.shopId,_that.name,_that.pin);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String shopId,  String name,  String pin)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String shopId,  String name,  String pin,  bool isAdmin)  $default,) {final _that = this;
 switch (_that) {
 case _Waiter():
-return $default(_that.id,_that.shopId,_that.name,_that.pin);case _:
+return $default(_that.id,_that.shopId,_that.name,_that.pin,_that.isAdmin);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -197,10 +198,10 @@ return $default(_that.id,_that.shopId,_that.name,_that.pin);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String shopId,  String name,  String pin)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String shopId,  String name,  String pin,  bool isAdmin)?  $default,) {final _that = this;
 switch (_that) {
 case _Waiter() when $default != null:
-return $default(_that.id,_that.shopId,_that.name,_that.pin);case _:
+return $default(_that.id,_that.shopId,_that.name,_that.pin,_that.isAdmin);case _:
   return null;
 
 }
@@ -212,13 +213,14 @@ return $default(_that.id,_that.shopId,_that.name,_that.pin);case _:
 @JsonSerializable()
 
 class _Waiter implements Waiter {
-  const _Waiter({required this.id, required this.shopId, required this.name, required this.pin});
+  const _Waiter({required this.id, required this.shopId, required this.name, required this.pin, this.isAdmin = false});
   factory _Waiter.fromJson(Map<String, dynamic> json) => _$WaiterFromJson(json);
 
 @override final  String id;
 @override final  String shopId;
 @override final  String name;
 @override final  String pin;
+@override@JsonKey() final  bool isAdmin;
 
 /// Create a copy of Waiter
 /// with the given fields replaced by the non-null parameter values.
@@ -233,16 +235,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Waiter&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.name, name) || other.name == name)&&(identical(other.pin, pin) || other.pin == pin));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Waiter&&(identical(other.id, id) || other.id == id)&&(identical(other.shopId, shopId) || other.shopId == shopId)&&(identical(other.name, name) || other.name == name)&&(identical(other.pin, pin) || other.pin == pin)&&(identical(other.isAdmin, isAdmin) || other.isAdmin == isAdmin));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,shopId,name,pin);
+int get hashCode => Object.hash(runtimeType,id,shopId,name,pin,isAdmin);
 
 @override
 String toString() {
-  return 'Waiter(id: $id, shopId: $shopId, name: $name, pin: $pin)';
+  return 'Waiter(id: $id, shopId: $shopId, name: $name, pin: $pin, isAdmin: $isAdmin)';
 }
 
 
@@ -253,7 +255,7 @@ abstract mixin class _$WaiterCopyWith<$Res> implements $WaiterCopyWith<$Res> {
   factory _$WaiterCopyWith(_Waiter value, $Res Function(_Waiter) _then) = __$WaiterCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String shopId, String name, String pin
+ String id, String shopId, String name, String pin, bool isAdmin
 });
 
 
@@ -270,13 +272,14 @@ class __$WaiterCopyWithImpl<$Res>
 
 /// Create a copy of Waiter
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? shopId = null,Object? name = null,Object? pin = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? shopId = null,Object? name = null,Object? pin = null,Object? isAdmin = null,}) {
   return _then(_Waiter(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,shopId: null == shopId ? _self.shopId : shopId // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,pin: null == pin ? _self.pin : pin // ignore: cast_nullable_to_non_nullable
-as String,
+as String,isAdmin: null == isAdmin ? _self.isAdmin : isAdmin // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

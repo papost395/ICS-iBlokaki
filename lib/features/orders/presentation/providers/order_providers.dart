@@ -10,14 +10,19 @@ import 'package:order/features/orders/domain/repositories/order_repository.dart'
 import 'package:order/features/tables/domain/entities/table_status.dart';
 import 'package:order/features/tables/presentation/providers/table_providers.dart';
 
+import 'package:order/core/providers/storage_mode_provider.dart';
+import 'package:order/core/database/database_helper.dart';
+
 part 'order_providers.g.dart';
 
 @Riverpod(keepAlive: true)
 OrderRepository orderRepository(Ref ref) {
   final pb = ref.watch(pocketBaseProvider);
+  final isLocalMode = ref.watch(storageModeNotifierProvider);
   return OrderRepositoryImpl(
     remoteDataSource: OrderRemoteDataSourceImpl(pb: pb),
     pb: pb,
+    isLocalMode: isLocalMode,
   );
 }
 
@@ -68,6 +73,7 @@ class OrderActions extends _$OrderActions {
       // Ignore if it fails to update table status here, not critical for order creation
     }
     
+    ref.invalidate(activeOrdersStreamProvider);
     return order;
   }
 
@@ -80,6 +86,7 @@ class OrderActions extends _$OrderActions {
 
     final repo = ref.read(orderRepositoryProvider);
     await repo.addItem(orderId: orderId, shopId: shopId, item: item);
+    ref.invalidate(activeOrdersStreamProvider);
   }
 
   Future<void> updateStatus({
@@ -88,6 +95,7 @@ class OrderActions extends _$OrderActions {
   }) async {
     final repo = ref.read(orderRepositoryProvider);
     await repo.updateOrderStatus(orderId: orderId, status: status);
+    ref.invalidate(activeOrdersStreamProvider);
   }
 
   Future<void> updateItemPrintStatus({
@@ -96,6 +104,7 @@ class OrderActions extends _$OrderActions {
   }) async {
     final repo = ref.read(orderRepositoryProvider);
     await repo.updateItemPrintStatus(itemId: itemId, printStatus: printStatus);
+    ref.invalidate(activeOrdersStreamProvider);
   }
 
   Future<void> updateItemNotes({
@@ -104,6 +113,7 @@ class OrderActions extends _$OrderActions {
   }) async {
     final repo = ref.read(orderRepositoryProvider);
     await repo.updateItemNotes(itemId: itemId, notes: notes);
+    ref.invalidate(activeOrdersStreamProvider);
   }
 
   Future<void> updateItemReceiptOnly({
@@ -112,6 +122,7 @@ class OrderActions extends _$OrderActions {
   }) async {
     final repo = ref.read(orderRepositoryProvider);
     await repo.updateItemReceiptOnly(itemId: itemId, receiptOnly: receiptOnly);
+    ref.invalidate(activeOrdersStreamProvider);
   }
 
   Future<void> cancelActiveOrdersForTable({
@@ -128,5 +139,44 @@ class OrderActions extends _$OrderActions {
         await repo.updateOrderStatus(orderId: order.id, status: OrderStatus.cancelled);
       }
     }
+    ref.invalidate(activeOrdersStreamProvider);
+  }
+
+  Future<void> completeActiveOrdersForTable({
+    required String tableId,
+  }) async {
+    final shopId = ref.read(currentShopIdProvider);
+    if (shopId == null) return;
+    
+    final repo = ref.read(orderRepositoryProvider);
+    final orders = await repo.getOrdersByTable(shopId: shopId, tableId: tableId);
+    
+    final salesRecords = <Map<String, dynamic>>[];
+    final nowMs = DateTime.now().millisecondsSinceEpoch;
+    
+    for (final order in orders) {
+      if (order.status != OrderStatus.completed && order.status != OrderStatus.cancelled) {
+        await repo.updateOrderStatus(orderId: order.id, status: OrderStatus.completed);
+        
+        for (final item in order.items) {
+          salesRecords.add({
+            'id': 'sale_${item.id}',
+            'shopId': shopId,
+            'productId': item.productId,
+            'productName': item.productName,
+            'quantity': item.quantity,
+            'price': item.priceAtOrder,
+            'timestamp': nowMs,
+            'orderType': 'table',
+          });
+        }
+      }
+    }
+    
+    if (salesRecords.isNotEmpty) {
+      await DatabaseHelper.instance.addSalesRecords(salesRecords);
+    }
+    
+    ref.invalidate(activeOrdersStreamProvider);
   }
 }

@@ -11,6 +11,8 @@ abstract class ShopConfig with _$ShopConfig {
     @Default(false) bool isSplitPrintingEnabled,
     @Default('') String receiptHeader,
     @Default('') String receiptFooter,
+    String? logoPath,
+    String? stationName,
   }) = _ShopConfig;
 
   factory ShopConfig.fromJson(Map<String, dynamic> json) =>

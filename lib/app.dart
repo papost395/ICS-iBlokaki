@@ -15,7 +15,7 @@ class App extends ConsumerWidget {
     final locale = ref.watch(localeNotifierProvider);
 
     return MaterialApp.router(
-      title: 'iBlokaki',
+      title: 'ΜΣΙ "Ηρώδοτος"',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
